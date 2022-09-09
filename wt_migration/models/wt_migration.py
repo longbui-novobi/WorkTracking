@@ -315,16 +315,19 @@ class TaskMigration(models.Model):
                 local['dict_project_key'][project] = self._get_single_project(project_key=project)
 
     def create_missing_users(self, issues, local):
+        processed = set()
         to_create_users = [(issue.assignee_email, issue.assignee_name) for issue in issues if
                            issue.assignee_email and issue.assignee_email not in local['dict_user']]
         to_create_users += [(issue.tester_email, issue.tester_name) for issue in issues if
                             issue.tester_email and issue.tester_email not in local['dict_user']]
         for user in to_create_users:
-            local['dict_user'][user[0]] = self.env['res.users'].sudo().create({
-                'login': user[0],
-                'name': user[1],
-                'active': False
-            }).id
+            if user[0] not in processed:
+                local['dict_user'][user[0]] = self.env['res.users'].sudo().create({
+                    'login': user[0],
+                    'name': user[1],
+                    'active': False
+                }).id
+                processed.add(user[0])
 
     def create_missing_statuses(self, issues, local):
         for issue in issues:
