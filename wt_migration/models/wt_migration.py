@@ -292,11 +292,15 @@ class TaskMigration(models.Model):
                 del curd_data[keys[index]]
             index += 1
         if issue.issue_key not in local['dict_issue_key']:
-            response['new'].append(curd_data)
             if self.is_load_acs and issue.checklists:
                 step = self._create_new_acs(issue.checklists)
                 if step:
                     curd_data['ac_ids'] = step
+            response['new'].append(curd_data)
+            try:
+                self.env['wt.issue'].create(curd_data)
+            except Exception as e:
+                _logger.error(json.dumps(curd_data, indent=4))
         else:
             existing_issue = local['dict_issue_key'].get(issue.issue_key)
             curd_data = self.minify_with_existing_record(curd_data, existing_issue)
