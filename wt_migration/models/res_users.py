@@ -1,17 +1,15 @@
 from odoo import models, fields, _
-from odoo.tools import ormcache
-
+from odoo.addons.wt_sdk import token
 
 class ResUsers(models.Model):
     _inherit = "res.users"
 
-    @ormcache('self')
     def get_jira_token(self):
-        return self.env['token.storage'].get_token("jira_" + str(self.login or self.partner_id.email))
+        return token.get_token("jira_" + str(self.login or self.partner_id.email), self)
 
     def set_jira_token(self, value):
-        self.env['token.storage'].set_token("jira_" + str(self.login or self.partner_id.email), value)
-
+        token.set_token("jira_" + str(self.login or self.partner_id.email), value, self)
+        
     def token_exists(self):
         existing_token_users = self.env['res.users']
         for user in self:

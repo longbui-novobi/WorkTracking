@@ -1,8 +1,15 @@
 import os
 from odoo import tools
 from odoo.tools.config import _get_default_datadir
-from odoo import SUPERUSER_ID, api
+import uuid 
 
+
+key = os.environ.get('TMTOKEN')
+print(key)
+if not key:
+    key = uuid.uuid4().hex[:10].upper()
+    os.environ["TMTOKEN"] = key
+print(key)
 TOKEN_DIR = "/".join(_get_default_datadir().split('/')[:-1]) + '/token/'
 if not os.path.exists(TOKEN_DIR):
     os.makedirs(TOKEN_DIR)
