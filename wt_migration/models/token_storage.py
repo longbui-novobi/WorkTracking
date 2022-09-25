@@ -32,11 +32,14 @@ class TokenStorage(models.Model):
         res = self.env.cr.dictfetchone()
         if not res:
             raise UserError("Cannot find token for the user: " + self.env.user.display_name)
-        b64 = b64decode(res['value'])
-        new_iv, new_ct = b64[:AES.block_size], b64[AES.block_size:]
-        cipher = AES.new(CRYPTO_KEY, AES.MODE_CBC, new_iv)
-        plan_text = cipher.decrypt(new_ct)
-        result = unpad(plan_text, AES.block_size).decode('utf-8')
+        try:
+            b64 = b64decode(res['value'])
+            new_iv, new_ct = b64[:AES.block_size], b64[AES.block_size:]
+            cipher = AES.new(CRYPTO_KEY, AES.MODE_CBC, new_iv)
+            plan_text = cipher.decrypt(new_ct)
+            result = unpad(plan_text, AES.block_size).decode('utf-8')
+        except:
+            raise UserError("Cannot find token for the user: " + self.env.user.display_name)
         return result
 
     def set_token(self, key, value):
