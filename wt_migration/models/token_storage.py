@@ -31,7 +31,7 @@ class TokenStorage(models.Model):
         self.env.cr.execute(f"SELECT value FROM token_cache WHERE key = '{key}'")
         res = self.env.cr.dictfetchone()
         if not res:
-            raise UserError("Cannot find token for the key: " + str(key))
+            raise UserError("Cannot find token for the user: " + self.env.user.display_name)
         b64 = b64decode(res['value'])
         new_iv, new_ct = b64[:AES.block_size], b64[AES.block_size:]
         cipher = AES.new(CRYPTO_KEY, AES.MODE_CBC, new_iv)
