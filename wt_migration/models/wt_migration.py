@@ -542,7 +542,7 @@ class TaskMigration(models.Model):
             self.mapping_worklog(local, log, issue, response)
         return response
 
-    def load_work_logs_by_unix(self, unix, users, batch=900):
+    def load_work_logs_by_unix(self, unix, users, batch=900, end_unix=-1):
         if self.import_work_log:
             for user in users:
                 last_page = False
@@ -592,6 +592,8 @@ class TaskMigration(models.Model):
                                     time.sleep(30)
                                     continue
                         del body['values']
+                        if end_unix > 0 and end_unix > body.get('until', 0):
+                            last_page = True
                         _logger.info(json.dumps(body, indent=4))
                     else:
                         _logger.warning(f"PAGE LOAD FAILED COUNT: {page_failed_count}")
