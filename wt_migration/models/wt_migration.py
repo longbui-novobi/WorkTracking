@@ -762,7 +762,7 @@ class TaskMigration(models.Model):
         project_ids = self.env["wt.project"].sudo().search([])
         self.load_boards(project_ids=project_ids)
         for project_id in project_ids:
-            self.update_board(project_id)
+            self.with_delay().update_board(project_id)
 
     def update_board(self, project_id):
         self.load_sprints(project_id.board_ids)

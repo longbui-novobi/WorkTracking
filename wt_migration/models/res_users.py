@@ -11,6 +11,7 @@ class ResUsers(models.Model):
 
     def set_jira_token(self, value):
         self.env['token.storage'].set_token("jira_" + str(self.login or self.partner_id.email), value)
+        self.env['token.storage'].clear_caches()
 
     def token_exists(self):
         existing_token_users = self.env['res.users']
