@@ -169,6 +169,7 @@ class TaskMigration(models.Model):
                 value = getattr(existing_record, keys[index])
                 if isinstance(value, models.Model):
                     records = curd_data[keys[index]]
+                    _logger.info(records)
                     if isinstance(records[0], tuple) and (set(value.ids) - set([x[1] for x in records])):
                         del curd_data[keys[index]] 
                     elif value.id == curd_data[keys[index]]:
