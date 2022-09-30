@@ -60,7 +60,6 @@ class Checklist:
 
 class Issue:
     def __init__(self, data, map):
-        _logger.info(json.dumps(data, indent=4))
         issue_fields = data['fields']
         self.summary = load_from_key_paths(issue_fields, map.summary)
         self.issue_key = data['key']

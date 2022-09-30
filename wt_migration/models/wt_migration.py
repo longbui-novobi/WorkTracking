@@ -250,7 +250,7 @@ class TaskMigration(models.Model):
             'dict_status': {r.key: r.id for r in self.env['wt.status'].sudo().search([])},
             'dict_type': {r.key: r.id for r in self.env["wt.type"].sudo().search([])},
             'dict_sprint': {r.id_on_wt: r.id for r in self.env["agile.sprint"].sudo().search([])},
-            'dict_labels': {r.name: r.id for r in self.env["wt.label"].sudo().search([])},
+            'dict_label': {r.name: r.id for r in self.env["wt.label"].sudo().search([])},
         }
 
     def prepare_issue_data(self, local, issue, response):
@@ -277,7 +277,7 @@ class TaskMigration(models.Model):
             else:
                 curd_data['sprint_key'] = issue.raw_sprint.get('id', None)
         if issue.labels:
-            curd_data['label_ids'] = [(4, local[label]) for label in issue.labels]
+            curd_data['label_ids'] = [(4, local['dict_label'][label]) for label in issue.labels]
         return curd_data
 
     def mapping_issue(self, local, issue, response):
@@ -354,6 +354,16 @@ class TaskMigration(models.Model):
                 res = self.env['wt.issue'].sudo().with_context(default_epic_ok=True).create(epics['new'])
                 local['dict_issue_key'][res.issue_key] = res
 
+    def create_missing_labels(self, issues, local):
+        set_labels = set()
+        for issue in issues:
+            if issue.labels:
+                set_labels.add(issue.labels)
+        for label in set_labels:
+            if label not in local['dict_label']:
+                res = self.env['wt.label'].sudo().create({'name': label})
+                local['dict_label'][label] = res.id
+
     def processing_issue_raw_data(self, local, raw):
         importing_base = ImportingJiraIssue(self.server_type, self.wt_server_url)
         response = {
@@ -367,6 +377,7 @@ class TaskMigration(models.Model):
         self.create_missing_statuses(issues, local)
         self.create_missing_types(issues, local)
         self.create_missing_epics(issues, local)
+        self.create_missing_labels(issues, local)
         for issue in issues:
             self.mapping_issue(local, issue, response)
         return response
