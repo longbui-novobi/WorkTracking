@@ -358,7 +358,7 @@ class TaskMigration(models.Model):
         set_labels = set()
         for issue in issues:
             if issue.labels:
-                set_labels.add(issue.labels)
+                set_labels.update(issue.labels)
         for label in set_labels:
             if label not in local['dict_label']:
                 res = self.env['wt.label'].sudo().create({'name': label})
