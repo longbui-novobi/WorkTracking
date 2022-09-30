@@ -13,3 +13,4 @@ from . import wt_type
 from . import wt_ac
 from . import board
 from . import agile_sprint
+from . import wt_label
