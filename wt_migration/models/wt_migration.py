@@ -12,6 +12,7 @@ from odoo.addons.wt_migration.utils.ac_parsing import parsing, unparsing
 from odoo.addons.wt_migration.models.mapping_table import IssueMapping, WorkLogMapping, ACMapping
 from odoo.addons.wt_sdk.jira.import_jira_formatter import ImportingJiraIssue, ImportingJiraWorkLog
 from odoo.addons.base.models.res_partner import _tz_get
+from odoo.fields import Command
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -167,7 +168,10 @@ class TaskMigration(models.Model):
             if keys[index] not in SPECIAL_FIELDS:
                 value = getattr(existing_record, keys[index])
                 if isinstance(value, models.Model):
-                    if value.id == curd_data[keys[index]]:
+                    records = curd_data[keys[index]]
+                    if isinstance(records[0], tuple) and (set(value.ids) - set([x[1] for x in records])):
+                        del curd_data[keys[index]] 
+                    elif value.id == curd_data[keys[index]]:
                         del curd_data[keys[index]]
                 elif isinstance(value, datetime):
                     if value and value.isoformat()[:16] == curd_data[keys[index]].isoformat()[:16]:
@@ -246,7 +250,9 @@ class TaskMigration(models.Model):
             'dict_issue_key': {r.issue_key: r for r in self.env['wt.issue'].sudo().search(domain)},
             'dict_status': {r.key: r.id for r in self.env['wt.status'].sudo().search([])},
             'dict_type': {r.key: r.id for r in self.env["wt.type"].sudo().search([])},
-            'dict_sprint': {r.id_on_wt: r.id for r in self.env["agile.sprint"].sudo().search([])}
+            'dict_sprint': {r.id_on_wt: r.id for r in self.env["agile.sprint"].sudo().search([])},
+            'dict_labels': {r.name: r.id for r in self.env["wt.label"].sudo().search([])},
+            'set_labels': {r.name for r in self.env["wt.label"].sudo().search([])}
         }
 
     def prepare_issue_data(self, local, issue, response):
@@ -272,6 +278,8 @@ class TaskMigration(models.Model):
                 curd_data['sprint_id'] = sprint.id
             else:
                 curd_data['sprint_key'] = issue.raw_sprint.get('id', None)
+        if issue.labels:
+            curd_data['label_ids'] = [(4, label) for label in issue.labels]
         return curd_data
 
     def mapping_issue(self, local, issue, response):
