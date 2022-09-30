@@ -251,7 +251,6 @@ class TaskMigration(models.Model):
             'dict_type': {r.key: r.id for r in self.env["wt.type"].sudo().search([])},
             'dict_sprint': {r.id_on_wt: r.id for r in self.env["agile.sprint"].sudo().search([])},
             'dict_labels': {r.name: r.id for r in self.env["wt.label"].sudo().search([])},
-            'set_labels': {r.name for r in self.env["wt.label"].sudo().search([])}
         }
 
     def prepare_issue_data(self, local, issue, response):
@@ -278,7 +277,7 @@ class TaskMigration(models.Model):
             else:
                 curd_data['sprint_key'] = issue.raw_sprint.get('id', None)
         if issue.labels:
-            curd_data['label_ids'] = [(4, label) for label in issue.labels]
+            curd_data['label_ids'] = [(4, local[label]) for label in issue.labels]
         return curd_data
 
     def mapping_issue(self, local, issue, response):

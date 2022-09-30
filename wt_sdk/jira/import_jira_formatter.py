@@ -60,6 +60,7 @@ class Checklist:
 
 class Issue:
     def __init__(self, data, map):
+        _logger.info(json.dumps(data, indent=4))
         issue_fields = data['fields']
         self.summary = load_from_key_paths(issue_fields, map.summary)
         self.issue_key = data['key']
@@ -79,7 +80,7 @@ class Issue:
         self.raw_status_key = load_from_key_paths(issue_fields, map.new_status)
         self.remote_id = int(data['id'])
         self.raw_sprint = load_from_key_paths(issue_fields, map.sprint)
-        self.labels = set(load_from_key_paths(issue_fields, map.labels))
+        self.labels = load_from_key_paths(issue_fields, map.labels)
         raw_checklist = load_from_key_paths(issue_fields, map.checklist)
         if raw_checklist:
             self.checklists = map.map_checklists(raw_checklist)
