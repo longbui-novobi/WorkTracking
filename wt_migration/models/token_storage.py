@@ -22,7 +22,7 @@ class TokenStorage(models.Model):
         return s[:-ord(s[len(s) - 1:])]
 
     def init_token_storage(self):
-        self.env.cr.create("""
+        self.env.cr.execute("""
                 CREATE TABLE IF NOT EXISTS token_cache ( key VARCHAR UNIQUE, value VARCHAR);
                 CREATE INDEX IF NOT EXISTS token_cache_index ON token_cache USING HASH (key);
             """)
