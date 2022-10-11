@@ -5,7 +5,6 @@ class WtProject(models.Model):
     _name = "wt.project"
     _description = "Task Project"
     _order = 'pin desc, sequence asc, create_date desc'
-    _rec_name = 'project_key'
 
     pin = fields.Integer(string='Pin')
     sequence = fields.Integer(string='Sequence')
@@ -18,6 +17,14 @@ class WtProject(models.Model):
     chain_work_ids = fields.One2many("wt.chain.work.session", "project_id", "Chain Works")
     board_ids = fields.One2many('board.board', 'project_id', string="Boards")
     sprint_ids = fields.One2many('agile.sprint', 'project_id', string="Sprints")
+
+    def name_get(self):
+        res = []
+        field_name = self._context.get('full_project_name') and 'project_name' or 'project_key'
+        for project in self:
+            name = '%s' % getattr(project, field_name)
+            res.append((project.id, name))
+        return res
 
     def fetch_user_from_issue(self):
         for record in self:
