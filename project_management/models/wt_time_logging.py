@@ -19,7 +19,7 @@ class WtTimeLog(models.Model):
     _rec_name = 'issue_id'
 
     time = fields.Char(string='Time Logging', compute='_compute_time_data', store=True)
-    description = fields.Text(string='Description', required=True)
+    description = fields.Text(string='Description')
     issue_id = fields.Many2one('wt.issue', string='Issue', ondelete="cascade")
     duration = fields.Integer(string='Duration', required=True)
     cluster_id = fields.Many2one('wt.work.log.cluster')
