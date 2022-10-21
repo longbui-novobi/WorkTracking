@@ -10,8 +10,10 @@ class WtProject(models.Model):
     sequence = fields.Integer(string='Sequence')
     project_name = fields.Char(string='Name', required=True)
     project_key = fields.Char(string='Project Key')
-    allowed_user_ids = fields.Many2many('res.users', 'res_user_wt_project_rel_1', 'wt_project_id', 'res_users_id', string='Allowed Users')
-    allowed_manager_ids = fields.Many2many('res.users', 'res_user_wt_project_rel_2', 'wt_project_id', 'res_users_id', string='Managers')
+    allowed_user_ids = fields.Many2many('res.users', 'res_user_wt_project_rel_1', 'wt_project_id', 'res_users_id',
+                                        string='Allowed Users')
+    allowed_manager_ids = fields.Many2many('res.users', 'res_user_wt_project_rel_2', 'wt_project_id', 'res_users_id',
+                                           string='Managers')
     issue_ids = fields.One2many('wt.issue', 'project_id', string='Issues')
     wt_migration_id = fields.Many2one("wt.migration", string="Task Migration Credentials")
     chain_work_ids = fields.One2many("wt.chain.work.session", "project_id", "Chain Works")
@@ -61,3 +63,20 @@ class WtProject(models.Model):
         action = self.env['ir.actions.actions']._for_xml_id("project_management.action_wt_active_sprint")
         action["domain"] = [('project_id', '=', self.id)]
         return action
+
+    def action_export_record(self, workbook):
+        self.ensure_one()
+        header_format = workbook.add_format({
+            'text_wrap': True,
+            'valign': 'top',
+            'bold': True,
+            'align': 'center'
+        })
+        text_format = workbook.add_format({
+            'text_wrap': True,
+            'valign': 'top'
+        })
+        sheet = workbook.add_worksheet(self.display_name)
+        sheet.write(0, 0, self.display_name, header_format)
+        sheet.write(1, 0, self.project_key, text_format)
+        return workbook
