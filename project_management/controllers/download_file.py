@@ -28,8 +28,11 @@ class ListViewItemExport(http.Controller):
         data = json.loads(data)
         model, res_id, call_method = data.get('model', False), data.get('res_id', False), data.get('method', False)
         record = request.env[model].browse(res_id)
+        file_name = content_disposition(record.display_name)
+        if hasattr(record, 'get_report_file_name'):
+            file_name = content_disposition(record.get_report_file_name())
         response = request.make_response(None, headers=[('Content-Type', 'application/vnd.ms-excel'),
-                                               ('Content-Disposition', content_disposition(record.display_name))])
+                                                        ('Content-Disposition', file_name)])
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         if hasattr(record, call_method):
