@@ -1,6 +1,6 @@
 from odoo import fields, models, _
 
-class HREmployee(models.Model):
+class HREmployee(models.AbstractModel):
     _inherit = 'hr.employee.base'
 
     is_wt_admin = fields.Boolean(string="Admin?", tracking=True)
