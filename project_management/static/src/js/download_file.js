@@ -33,7 +33,7 @@ odoo.define('project_management.DownloadFile', function (require) {
                 data: {
                     data: JSON.stringify({
                         "model": self.recordData.model,
-                        "res_id": self.recordData.res_ids,
+                        "res_id": self.recordData.res_id,
                         "method": self.attrs.call_method
                     })
                 },

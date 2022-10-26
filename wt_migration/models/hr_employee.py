@@ -1,7 +1,7 @@
 from odoo import fields, models, _
 
-class HREmployee(models.Model):
-    _inherit = 'hr.employee'
+class HREmployee(models.AbstractModel):
+    _inherit = 'hr.employee.base'
 
     is_wt_admin = fields.Boolean(string="Admin?", tracking=True)
     auto_export_work_log = fields.Boolean(string='Auto Export Logs', tracking=True)
