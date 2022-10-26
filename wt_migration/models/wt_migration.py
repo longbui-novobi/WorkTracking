@@ -102,11 +102,13 @@ class TaskMigration(models.Model):
         users = self.env["res.users"].sudo()
         for record in records:
             if record["name"] not in current_employee_data["user_email"]:
-                users |= self.env["res.users"].sudo().create({
+                new_user = self.env["res.users"].sudo().create({
                     "name": record["displayName"],
                     "login": record["name"],
                     'active': False
                 })
+                new_user.action_create_employee()
+                users |= new_user
 
     def load_projects(self):
         headers = self.__get_request_headers()
@@ -322,11 +324,13 @@ class TaskMigration(models.Model):
                             issue.tester_email and issue.tester_email not in local['dict_user']]
         for user in to_create_users:
             if user[0] not in processed:
-                local['dict_user'][user[0]] = self.env['res.users'].sudo().create({
+                new_user = self.env['res.users'].sudo().create({
                     'login': user[0],
                     'name': user[1],
                     'active': False
-                }).id
+                })
+                new_user.action_create_employee()
+                local['dict_user'][user[0]] = new_user.id
                 processed.add(user[0])
 
     def create_missing_statuses(self, issues, local):
