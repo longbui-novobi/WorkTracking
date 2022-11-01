@@ -33,15 +33,16 @@ class WtTimeLog(models.Model):
         res = super().write(values)
         if 'is_exported' not in values:
             employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1)
-            if self.issue_id.wt_migration_id.auto_export_work_log and employee_id.auto_export_work_log:
-                try:
-                    self.issue_id.wt_migration_id.export_specific_log(self.issue_id, self)
-                    self.is_exported = True
-                except Exception as e:
-                    _logger.error(e)
-                    self.is_exported = False
-            elif self.is_exported:
-                self.is_exported = False
+            for record in self:
+                if record.issue_id.wt_migration_id.auto_export_work_log and employee_id.auto_export_work_log:
+                    try:
+                        record.issue_id.wt_migration_id.export_specific_log(record.issue_id, record)
+                        record.is_exported = True
+                    except Exception as e:
+                        _logger.error(e)
+                        record.is_exported = False
+                elif record.is_exported:
+                    record.is_exported = False
         return res
 
     def force_export(self):

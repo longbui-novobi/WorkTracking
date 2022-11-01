@@ -12,6 +12,7 @@ from odoo.addons.wt_migration.utils.ac_parsing import parsing, unparsing
 from odoo.addons.wt_migration.models.mapping_table import IssueMapping, WorkLogMapping, ACMapping
 from odoo.addons.wt_sdk.jira.import_jira_formatter import ImportingJiraIssue, ImportingJiraWorkLog
 from odoo.addons.base.models.res_partner import _tz_get
+from odoo.fields import Command
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -41,6 +42,7 @@ class TaskMigration(models.Model):
     wt_agile_url = fields.Char(string="Task Agile URL")
     admin_user_ids = fields.Many2many("res.users", string="Admins")
     active = fields.Boolean(string="Active?", default=True)
+    is_round_robin = fields.Boolean(string="Share Sync?")
 
     def action_toggle(self):
         for record in self:
@@ -58,24 +60,13 @@ class TaskMigration(models.Model):
 
     def __get_request_headers(self):
         self.ensure_one()
-        employee_id = self._context.get('employee_id')
-        if not employee_id:
-            user = self.env.user or self.admin_user_ids
-            employee_id = self.env['hr.employee'].search([('user_id', '=', user.id)], limit=1)
-            if not employee_id:
-                raise UserError(_("Don't have any related Employee, please set up on Employee Application"))
-            if not employee_id.wt_private_key:
-                raise UserError(_("Missing the Access token in the related Employee"))
-            wt_private_key = employee_id.wt_private_key
-        else:
-            user = employee_id.user_id
-            wt_private_key = employee_id.wt_private_key
+        user = self.env.user
+        wt_private_key = user.get_jira_token()
         if self.auth_type == 'api_token':
             wt_private_key = "Basic " + base64.b64encode(
                 f"{user.partner_id.email or user.login}:{wt_private_key}".encode('utf-8')).decode('utf-8')
         else:
             wt_private_key = "Bearer " + wt_private_key
-
         headers = {
             'Authorization': wt_private_key
         }
@@ -85,18 +76,13 @@ class TaskMigration(models.Model):
         headers = self.__get_request_headers()
         result = requests.get(f"{self.wt_server_url}/project/{project_key}", headers=headers)
         record = json.loads(result.text)
-        if self.env.context.get('employee_id'):
-            user_id = self._context['employee_id'].user_id
-        else:
-            user_id = self.env['hr.employee'].search(
-                [('wt_private_key', '!=', False), ('user_id', '=', self.env.user.id)], limit=1).user_id
         res = {
             'project_name': record['name'],
             'project_key': record['key'],
-            'wt_migration_id': self.id
+            'wt_migration_id': self.id,
+            'allow_to_fetch': True,
+            'allowed_user_ids': [(4, self.env.user.id, False)]
         }
-        if user_id:
-            res['allowed_user_ids'] = [(4, user_id.id, False)]
         return self.env['wt.project'].sudo().create(res).id
 
     def _get_current_employee(self):
@@ -116,23 +102,20 @@ class TaskMigration(models.Model):
         users = self.env["res.users"].sudo()
         for record in records:
             if record["name"] not in current_employee_data["user_email"]:
-                users |= self.env["res.users"].sudo().create({
+                new_user = self.env["res.users"].sudo().create({
                     "name": record["displayName"],
                     "login": record["name"],
                     'active': False
                 })
+                new_user.action_create_employee()
+                users |= new_user
 
     def load_projects(self):
         headers = self.__get_request_headers()
         result = requests.get(f"{self.wt_server_url}/project", headers=headers)
         existing_project = self.env['wt.project'].search([])
         existing_project_dict = {f"{r.project_key}": r for r in existing_project}
-        user_id = False
-        if self.env.context.get('employee_id'):
-            user_id = self._context['employee_id'].user_id
-        else:
-            user_id = self.env['hr.employee'].search(
-                [('wt_private_key', '!=', False), ('user_id', '=', self.env.user.id)], limit=1).user_id
+        user_id = self.env.user
         new_project = []
         for record in json.loads(result.text):
             if not existing_project_dict.get(record.get('key', False), False):
@@ -187,7 +170,10 @@ class TaskMigration(models.Model):
             if keys[index] not in SPECIAL_FIELDS:
                 value = getattr(existing_record, keys[index])
                 if isinstance(value, models.Model):
-                    if value.id == curd_data[keys[index]]:
+                    if isinstance(curd_data[keys[index]], int):
+                        if value.id == curd_data[keys[index]]:
+                            del curd_data[keys[index]]
+                    elif not (set([x[1] for x in curd_data[keys[index]]]) - set(value.ids)):
                         del curd_data[keys[index]]
                 elif isinstance(value, datetime):
                     if value and value.isoformat()[:16] == curd_data[keys[index]].isoformat()[:16]:
@@ -218,25 +204,26 @@ class TaskMigration(models.Model):
         if not values:
             return False
         value_keys = {r.key: r for r in values}
-        to_delete_records = ac_ids.filtered(lambda r: r.key not in value_keys)
+        to_delete_records = ac_ids.filtered(lambda r: r.key and r.key not in value_keys)
         ac_ids -= to_delete_records
         res = []
         res += to_delete_records.mapped(lambda r: (2, r.id))
         for record in ac_ids:
-            r = value_keys[record.key]
-            if record.key != r.key \
-                    or r.is_header != record.is_header \
-                    or record.sequence != r.sequence \
-                    or record.checked != r.checked:
-                res.append((1, record.id, {
-                    'name': parsing(r.name),
-                    'wt_raw_name': r.name,
-                    "checked": r.checked or record.checked,
-                    "key": r.key,
-                    "sequence": r.sequence,
-                    "is_header": r.is_header
-                }))
-            del value_keys[record.key]
+            if record.key:
+                r = value_keys.get(record.key, None)
+                if r:
+                    if (r.is_header != record.is_header \
+                            or record.sequence != r.sequence \
+                            or record.checked != r.checked):
+                        res.append((1, record.id, {
+                            'name': parsing(r.name),
+                            'wt_raw_name': r.name,
+                            "checked": r.checked or record.checked,
+                            "key": r.key,
+                            "sequence": r.sequence,
+                            "is_header": r.is_header
+                        }))
+                    del value_keys[record.key]
         res += self._create_new_acs(list(value_keys.values()))
         return res
 
@@ -264,10 +251,12 @@ class TaskMigration(models.Model):
             'dict_user': self.with_context(active_test=False).get_user(),
             'dict_issue_key': {r.issue_key: r for r in self.env['wt.issue'].sudo().search(domain)},
             'dict_status': {r.key: r.id for r in self.env['wt.status'].sudo().search([])},
-            'dict_type': {r.key: r.id for r in self.env["wt.type"].sudo().search([])}
+            'dict_type': {r.key: r.id for r in self.env["wt.type"].sudo().search([])},
+            'dict_sprint': {r.id_on_wt: r.id for r in self.env["agile.sprint"].sudo().search([])},
+            'dict_label': {r.name: r.id for r in self.env["wt.label"].sudo().search([])},
         }
 
-    def mapping_issue(self, local, issue, response):
+    def prepare_issue_data(self, local, issue, response):
         curd_data = {
             'issue_name': issue.summary,
             'issue_key': issue.issue_key,
@@ -275,16 +264,30 @@ class TaskMigration(models.Model):
             'story_point': issue.hour_point and issue.hour_point or issue.fibonacci_point,
             'story_point_unit': issue.hour_point and 'hrs' or 'general',
             'wt_migration_id': self.id,
-            'wt_id': issue.remote_id
+            'wt_id': issue.remote_id,
+            'project_id': local['dict_project_key'].get(issue.project_key),
+            'assignee_id': local['dict_user'].get(issue.assignee_email),
+            'tester_id': local['dict_user'].get(issue.tester_email),
+            'status_id': local['dict_status'].get(issue.status_key),
+            'issue_type_id': local['dict_type'].get(issue.issue_type_key)
         }
         if issue.epic:
             curd_data['epic_id'] = local['dict_issue_key'].get(issue.epic.issue_key).id
-        curd_data['project_id'] = local['dict_project_key'].get(issue.project_key)
-        curd_data['assignee_id'] = local['dict_user'].get(issue.assignee_email)
-        curd_data['tester_id'] = local['dict_user'].get(issue.tester_email)
-        curd_data['status_id'] = local['dict_status'].get(issue.status_key)
-        curd_data['issue_type_id'] = local['dict_type'].get(issue.issue_type_key)
+        if isinstance(issue.raw_sprint, dict) and issue.raw_sprint.get('id', None):
+            sprint = local['dict_sprint'].get(issue.raw_sprint.get('id', None))
+            if sprint:
+                curd_data['sprint_id'] = sprint.id
+            else:
+                curd_data['sprint_key'] = issue.raw_sprint.get('id', None)
+        if issue.labels:
+            curd_data['label_ids'] = [(4, local['dict_label'][label]) for label in issue.labels]
+        return curd_data
+
+    def mapping_issue(self, local, issue, response):
+        curd_data = self.prepare_issue_data(local, issue, response)
         index, length, keys = 0, len(curd_data.keys()), list(curd_data.keys())
+        if isinstance(curd_data['story_point'], dict):
+            _logger.error("ERROR AT" + str(curd_data['story_point']))
         while index < length:
             if curd_data[keys[index]] is None:
                 del curd_data[keys[index]]
@@ -307,7 +310,8 @@ class TaskMigration(models.Model):
                 existing_issue.write(curd_data)
 
     def create_missing_projects(self, issues, local):
-        to_create_projects = [issue.project_key for issue in issues if issue.project_key not in local['dict_project_key']]
+        to_create_projects = [issue.project_key for issue in issues if
+                              issue.project_key not in local['dict_project_key']]
         if len(to_create_projects):
             for project in to_create_projects:
                 local['dict_project_key'][project] = self._get_single_project(project_key=project)
@@ -320,11 +324,13 @@ class TaskMigration(models.Model):
                             issue.tester_email and issue.tester_email not in local['dict_user']]
         for user in to_create_users:
             if user[0] not in processed:
-                local['dict_user'][user[0]] = self.env['res.users'].sudo().create({
+                new_user = self.env['res.users'].sudo().create({
                     'login': user[0],
                     'name': user[1],
                     'active': False
-                }).id
+                })
+                new_user.action_create_employee()
+                local['dict_user'][user[0]] = new_user.id
                 processed.add(user[0])
 
     def create_missing_statuses(self, issues, local):
@@ -353,6 +359,16 @@ class TaskMigration(models.Model):
                 res = self.env['wt.issue'].sudo().with_context(default_epic_ok=True).create(epics['new'])
                 local['dict_issue_key'][res.issue_key] = res
 
+    def create_missing_labels(self, issues, local):
+        set_labels = set()
+        for issue in issues:
+            if issue.labels:
+                set_labels.update(issue.labels)
+        for label in set_labels:
+            if label not in local['dict_label']:
+                res = self.env['wt.label'].sudo().create({'name': label})
+                local['dict_label'][label] = res.id
+
     def processing_issue_raw_data(self, local, raw):
         importing_base = ImportingJiraIssue(self.server_type, self.wt_server_url)
         response = {
@@ -366,6 +382,7 @@ class TaskMigration(models.Model):
         self.create_missing_statuses(issues, local)
         self.create_missing_types(issues, local)
         self.create_missing_epics(issues, local)
+        self.create_missing_labels(issues, local)
         for issue in issues:
             self.mapping_issue(local, issue, response)
         return response
@@ -399,6 +416,10 @@ class TaskMigration(models.Model):
             if res:
                 existing_record |= res['updated']
             response.extend(res['new'])
+
+        if existing_record:
+            self.env.cr.execute(f"UPDATE wt_issue SET write_date = NOW() WHERE id IN %(ids)s",
+                                {'ids': tuple(existing_record.ids)})
         return existing_record | self.env['wt.issue'].sudo().create(response)
 
     def load_issues(self, extra_jql="", domain=[], load_all=False):
@@ -487,7 +508,7 @@ class TaskMigration(models.Model):
             'dict_issue_to_log': {}
         }
 
-    def mapping_worklog(self, local, log, issue, response):
+    def prepare_worklog_data(self, local, log, issue, response):
         curd_data = {
             'time': log.time,
             'duration': log.duration,
@@ -500,6 +521,10 @@ class TaskMigration(models.Model):
             'issue_id': issue.get(log.remote_issue_id, False),
             'is_exported': True
         }
+        return curd_data
+
+    def mapping_worklog(self, local, log, issue, response):
+        curd_data = self.prepare_worklog_data(local, log, issue, response)
         if log.remote_id not in local['dict_log']:
             if log.duration > 0 and issue.get(log.remote_issue_id, False):
                 response['new'].append(curd_data)
@@ -539,13 +564,12 @@ class TaskMigration(models.Model):
             self.mapping_worklog(local, log, issue, response)
         return response
 
-    def load_work_logs_by_unix(self, unix, employee_ids, batch=900):
+    def load_work_logs_by_unix(self, unix, users, batch=900, end_unix=-1):
         if self.import_work_log:
-            for employee_id in employee_ids:
-                self = self.with_context(employee_id=employee_id)
+            for user in users:
                 last_page = False
                 mapping = ImportingJiraWorkLog(self.server_type, self.wt_server_url)
-                headers = self.__get_request_headers()
+                headers = self.with_user(user).__get_request_headers()
                 issue_ids = self.env['wt.issue'].search(
                     [('wt_id', '!=', False), ('write_date', '>=', datetime.fromtimestamp(unix / 1000))])
                 local_data = {
@@ -559,7 +583,8 @@ class TaskMigration(models.Model):
                     'endpoint': f"{self.wt_server_url}/worklog/updated?since={unix}",
                 }
                 page_failed_count = 0
-                while not last_page and page_failed_count < 6:
+                page_break = False
+                while not last_page and page_failed_count < 6 and not page_break:
                     body = self.make_request(request_data, headers)
                     if isinstance(body, dict):
                         page_failed_count = 0
@@ -589,6 +614,8 @@ class TaskMigration(models.Model):
                                     time.sleep(30)
                                     continue
                         del body['values']
+                        if end_unix > 0 and end_unix > body.get('until', 0):
+                            last_page = True
                         _logger.info(json.dumps(body, indent=4))
                     else:
                         _logger.warning(f"PAGE LOAD FAILED COUNT: {page_failed_count}")
@@ -598,12 +625,11 @@ class TaskMigration(models.Model):
                 if len(to_create):
                     self.env["wt.time.log"].create(to_create)
 
-    def delete_work_logs_by_unix(self, unix, employee_ids, batch=900):
+    def delete_work_logs_by_unix(self, unix, users, batch=900):
         if self.import_work_log:
-            for employee_id in employee_ids:
-                self = self.with_context(employee_id=employee_id)
+            for user in users:
                 last_page = False
-                headers = self.__get_request_headers()
+                headers = self.with_user(user).__get_request_headers()
                 flush = []
                 request_data = {
                     'endpoint': f"{self.wt_server_url}/worklog/deleted?since={unix}",
@@ -729,32 +755,35 @@ class TaskMigration(models.Model):
         self.add_time_logs(issue_id, time_log_to_create_ids)
         self.update_time_logs(issue_id, time_log_to_update_ids)
 
-    def _update_project(self, project_id, employee_id):
-        self = self.with_context(employee_id=employee_id)
+    def _update_project(self, project_id, project_last_update):
         updated_date = datetime(1970, 1, 1, 1, 1, 1, 1)
-        if project_id.last_update:
-            updated_date = self.convert_utc_to_usertz(project_id.last_update)
+        if project_last_update:
+            updated_date = self.convert_utc_to_usertz(project_last_update)
         str_updated_date = updated_date.strftime('%Y-%m-%d %H:%M')
         params = f"""jql=project="{project_id.project_key}" AND updated >= '{str_updated_date}'"""
         request_data = {'endpoint': f"{self.wt_server_url}/search", "params": [params]}
+        _logger.info(json.dumps(request_data, indent=4))
         issue_ids = self.do_request(request_data, load_all=True)
         _logger.info(f"{project_id.project_name}: {len(issue_ids)}")
+        self.load_work_logs(issue_ids, load_all=True)
 
-    def update_project(self, project_id, access_token):
-        self.with_delay()._update_project(project_id, access_token)
-    
-    def update_projects(self, latest_unix, employee_ids):
-        for employee_id in employee_ids:
-            self = self.with_context(employee_id=employee_id)
-            str_updated_date = self.convert_utc_to_usertz(datetime.fromtimestamp(latest_unix/1000)).strftime('%Y-%m-%d %H:%M')
+    def update_project(self, project_id, user_id):
+        _self = self.with_user(user_id)
+        _self.with_delay()._update_project(project_id, project_id.last_update)
+
+    def update_projects(self, latest_unix, users):
+        for user in users:
+            self = self.with_user(user)
+            str_updated_date = self.convert_utc_to_usertz(datetime.fromtimestamp(latest_unix / 1000)).strftime(
+                '%Y-%m-%d %H:%M')
             params = f"""jql=updated >= '{str_updated_date}'"""
             request_data = {'endpoint': f"{self.wt_server_url}/search", "params": [params]}
             issue_ids = self.do_request(request_data, load_all=True)
-            _logger.info(f"Batch Load Of User {employee_id.name}: {len(issue_ids)}")
+            _logger.info(f"Batch Load Of User {user.display_name}: {len(issue_ids)}")
             _logger.info(",".join(issue_ids.mapped('issue_key')))
 
     def update_boards(self):
-        project_ids = self.env["wt.project"].search([])
+        project_ids = self.env["wt.project"].sudo().search([])
         self.load_boards(project_ids=project_ids)
         for project_id in project_ids:
             self.with_delay().update_board(project_id)
@@ -768,45 +797,60 @@ class TaskMigration(models.Model):
         if not self.wt_agile_url:
             return
         if not project_ids:
-            project_ids = self.env["wt.project"].search([])
+            project_ids = self.env["wt.project"].sudo().search([])
+        project_by_key = {project.project_key: project for project in project_ids}
+        existed_boards = set(project_ids.mapped('board_ids').mapped('id_on_wt'))
         headers = self.__get_request_headers()
-        for project in project_ids:
-            request_data = {
-                'endpoint': f"""{self.wt_agile_url}/board?projectKeyOrId={project.project_key}""",
-                'method': 'get',
-            }
-            current_boards = set(project.board_ids.mapped('id_on_wt'))
-            try:
-                data = self.make_request(request_data, headers)
-                for board in data['values']:
-                    if board['id'] not in current_boards:
+        request_data = {
+            'endpoint': f"""{self.wt_agile_url}/board""",
+            'method': 'get',
+            'params': ['type=scrum']
+        }
+        start_index, page_size, total_response, paging = 0, 50, 51, 50
+        while start_index < total_response:
+            page_size = paging if total_response - start_index > paging else total_response - start_index
+            params = request_data['params'].copy()
+            params += [f'startAt={start_index}', f'maxResults={page_size}']
+            request_data['params'] = params
+            data = self.make_request(request_data, headers) or {}
+            total_response = data.get('total', 1)
+            start_index += paging
+            for board in data.get('values', []):
+                if board.get('id') not in existed_boards:
+                    project = project_by_key[board.get('location', {}).get('projectKey', '')]
+                    if project:
                         self.env["board.board"].sudo().create({
                             'id_on_wt': board['id'],
                             'name': board['name'],
                             'type': board['type'],
                             'project_id': project.id
                         })
-            except Exception as e:
-                _logger.warning(f"Loading board on project {project.project_name} failed: " + str(e))
 
     def load_sprints(self, board_ids=False):
         if not self.wt_agile_url:
             return
         if not board_ids:
-            board_ids = self.env['board.board'].search([])
+            board_ids = self.env['board.board'].sudo().search([])
+        allowed_user_ids = self.env['res.users'].search([]).token_exists()
+        header_by_user = {self.env.user.id: self.__get_request_headers()}
         board_ids = board_ids.filtered(lambda r: r.type == "scrum")
-        headers = self.__get_request_headers()
         for board in board_ids:
             if not board.id_on_wt and not board.type == 'scrum':
                 continue
+            usable_user = (board.project_id.allowed_user_ids & allowed_user_ids)
+            if not usable_user:
+                continue
+            headers = header_by_user.get(usable_user[0]) or self.with_user(usable_user[0]).__get_request_headers()
+            if usable_user[0] not in header_by_user:
+                header_by_user[usable_user[0]] = headers
             request_data = {
-                'endpoint': f"""{self.wt_agile_url}/board/{board.id_on_wt}/sprint?maxResults=2000""",
+                'endpoint': f"""{self.wt_agile_url}/board/{board.id_on_wt}/sprint?maxResults=50""",
                 'method': 'get',
             }
             current_sprints = {x.id_on_wt: x for x in board.sprint_ids}
             try:
                 data = self.make_request(request_data, headers)
-                for sprint in data['values']:
+                for sprint in data.get('values', []):
                     if sprint['id'] not in current_sprints:
                         self.env["agile.sprint"].sudo().create({
                             'id_on_wt': sprint['id'],
@@ -817,7 +861,7 @@ class TaskMigration(models.Model):
                             'updated': True
                         })
                     elif sprint['state'] != current_sprints[sprint['id']].state:
-                        current_sprints[sprint['id']].write({
+                        current_sprints[sprint['id']].sudo().write({
                             'state': sprint['state'],
                             'updated': True
                         })
@@ -826,23 +870,9 @@ class TaskMigration(models.Model):
 
     def update_issue_for_sprints(self, sprint_ids=False):
         if not sprint_ids:
-            sprint_ids = self.env["agile.sprint"].search([('state', 'in', ('active', 'future'))])
-        headers = self.__get_request_headers()
-        current_issues = {x.issue_key: x for x in self.env["wt.issue"].search(
-            [('create_date', '>', datetime.now() - relativedelta(months=2))])}
-        force = self.env.context.get('force', False)
-        for sprint in sprint_ids:
-            if not sprint.id_on_wt:
-                continue
-            request_data = {
-                'endpoint': f"""{self.wt_agile_url}/sprint/{sprint.id_on_wt}/issue?maxResults=200&fields=""""",
-                'method': 'get',
-            }
-            try:
-                data = self.make_request(request_data, headers)
-                for issue in data['issues']:
-                    if issue['key'] in current_issues:
-                        current_issues[issue['key']].sprint_id = sprint.id
-                sprint.write({'updated': False})
-            except Exception as e:
-                _logger.warning(f"Loading issue of sprint {sprint.name} failed: " + str(e))
+            sprint_ids = self.env["agile.sprint"].sudo().search([('state', 'in', ('active', 'future'))])
+        sprint_by_id = {sprint.id_on_wt: sprint for sprint in sprint_ids}
+        issues = self.env['wt.issue'].sudo().search([('sprint_key', 'in', sprint_ids.mapped('id_on_wt'))])
+        for issue in issues:
+            issue.sprint_id = sprint_by_id[issue.sprint_key]
+            issue.sprint_key = False

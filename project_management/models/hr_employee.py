@@ -1,8 +1,8 @@
 from odoo import api, fields, models, _
 
 
-class HREmployee(models.Model):
-    _inherit = 'hr.employee'
+class HREmployee(models.AbstractModel):
+    _inherit = 'hr.employee.base'
 
     maximum_search_result = fields.Integer(string="# Search Result", default=11)
     maximum_relative_result = fields.Integer(string="# Relative Active", default=4)

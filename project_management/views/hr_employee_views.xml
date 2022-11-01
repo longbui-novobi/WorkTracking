@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook[1]" position="inside">
                 <page string="Task Configurations">
-                    <group>
+                    <group colspan="4">
                         <field name="default_unit"/>
                         <field name="maximum_search_result"/>
                         <field name="maximum_relative_result"/>
@@ -16,13 +16,30 @@
                     </group>
                 </page>
             </xpath>
-            <field name="lang" position="after">
+            <field name="work_location_id" position="after">
                 <field name="week_start" require="1"/>
             </field>
         </field>
     </record>
-    
-    <record id="hr.open_view_employee_list_my" model="ir.actions.act_window">
-        <field name="domain">[ '|', ('wt_private_key','=',False), ('user_id','=', uid)]</field>
+    <record id="wt_hr_form_view_public_inherited" model="ir.ui.view">
+        <field name="name">Task Configurations</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook[1]" position="inside">
+                <page string="Task Configurations">
+                    <group colspan="4">
+                        <field name="default_unit"/>
+                        <field name="maximum_search_result"/>
+                        <field name="maximum_relative_result"/>
+                        <field name="order_style"/>
+                        <field name="rouding_up"/>
+                    </group>
+                </page>
+            </xpath>
+            <field name="work_location_id" position="after">
+                <field name="week_start" require="1"/>
+            </field>
+        </field>
     </record>
 </odoo>

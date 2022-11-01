@@ -50,6 +50,8 @@ class WtProject(models.Model):
     encode_string = fields.Char(string="Hash String", compute='_compute_encode_string')
     duration_hrs = fields.Float(string="Duration(hrs)", compute="_compute_duration_hrs", store=True)
     sprint_id = fields.Many2one("agile.sprint", string="Sprint")
+    sprint_key = fields.Integer(string="Sprint ID on WT")
+    label_ids = fields.Many2many("wt.label", string="Labels")
 
     @api.depends("duration")
     def _compute_duration_hrs(self):

@@ -1,13 +1,14 @@
 # Copyright © 2021 Novobi, LLC
 # See LICENSE file for full copyright and licensing details.
 
-{
+{ 
     'name': 'Project Management',
     'summary': 'Project Management',
     'category': 'Project',
     "author": "Drake Bui",
     "website": "https://www.drakebui.ml/",
     "depends": ['hr', 'digest'],
+    "license": "LGPL-3",
     "data": [
         'data/project_data.xml',
         'data/digest_email_template.xml',

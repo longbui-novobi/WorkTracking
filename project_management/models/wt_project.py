@@ -5,19 +5,28 @@ class WtProject(models.Model):
     _name = "wt.project"
     _description = "Task Project"
     _order = 'pin desc, sequence asc, create_date desc'
-    _rec_name = 'project_key'
 
     pin = fields.Integer(string='Pin')
     sequence = fields.Integer(string='Sequence')
     project_name = fields.Char(string='Name', required=True)
     project_key = fields.Char(string='Project Key')
-    allowed_user_ids = fields.Many2many('res.users', string='Allowed Users')
-    allowed_manager_ids = fields.Many2many('res.users', 'res_user_wt_project_rel_2', string='Managers')
+    allowed_user_ids = fields.Many2many('res.users', 'res_user_wt_project_rel_1', 'wt_project_id', 'res_users_id',
+                                        string='Allowed Users')
+    allowed_manager_ids = fields.Many2many('res.users', 'res_user_wt_project_rel_2', 'wt_project_id', 'res_users_id',
+                                           string='Managers')
     issue_ids = fields.One2many('wt.issue', 'project_id', string='Issues')
     wt_migration_id = fields.Many2one("wt.migration", string="Task Migration Credentials")
     chain_work_ids = fields.One2many("wt.chain.work.session", "project_id", "Chain Works")
     board_ids = fields.One2many('board.board', 'project_id', string="Boards")
     sprint_ids = fields.One2many('agile.sprint', 'project_id', string="Sprints")
+
+    def name_get(self):
+        res = []
+        field_name = self._context.get('full_project_name') and 'project_name' or 'project_key'
+        for project in self:
+            name = '%s' % getattr(project, field_name)
+            res.append((project.id, name))
+        return res
 
     def fetch_user_from_issue(self):
         for record in self:
@@ -54,3 +63,20 @@ class WtProject(models.Model):
         action = self.env['ir.actions.actions']._for_xml_id("project_management.action_wt_active_sprint")
         action["domain"] = [('project_id', '=', self.id)]
         return action
+
+    def action_export_record(self, workbook):
+        self.ensure_one()
+        header_format = workbook.add_format({
+            'text_wrap': True,
+            'valign': 'top',
+            'bold': True,
+            'align': 'center'
+        })
+        text_format = workbook.add_format({
+            'text_wrap': True,
+            'valign': 'top'
+        })
+        sheet = workbook.add_worksheet(self.display_name)
+        sheet.write(0, 0, self.display_name, header_format)
+        sheet.write(1, 0, self.project_key, text_format)
+        return workbook
