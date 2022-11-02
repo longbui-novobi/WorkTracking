@@ -107,6 +107,7 @@ class TaskMigration(models.Model):
                     "login": record["name"],
                     'active': False
                 })
+                new_user.partner_id.email = record["name"]
                 new_user.action_create_employee()
                 users |= new_user
 
