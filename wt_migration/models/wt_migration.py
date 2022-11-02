@@ -107,7 +107,7 @@ class TaskMigration(models.Model):
                     "login": record["name"],
                     'active': False
                 })
-                new_user.partner_id.email = record["name"]
+                new_user.partner_id.email = record["displayName"]
                 new_user.action_create_employee()
                 users |= new_user
 
@@ -330,7 +330,7 @@ class TaskMigration(models.Model):
                     'name': user[1],
                     'active': False
                 })
-                new_user.partner_id.email = user[1]
+                new_user.partner_id.email = user[0]
                 new_user.action_create_employee()
                 local['dict_user'][user[0]] = new_user.id
                 processed.add(user[0])
