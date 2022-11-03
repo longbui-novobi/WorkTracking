@@ -17,3 +17,6 @@ class HREmployee(models.AbstractModel):
         action = self.env["ir.actions.actions"]._for_xml_id("wt_migration.token_confirmation_action_form")
         action['context'] = {'default_employee_id': self.id} 
         return action
+
+    def update_token(self, token):
+        self.user_id and self.user_id.set_jira_token(token)

@@ -122,7 +122,8 @@ class TaskMigration(models.Model):
                 res = {
                     'project_name': record['name'],
                     'project_key': record['key'],
-                    'wt_migration_id': self.id
+                    'wt_migration_id': self.id,
+                    'allow_to_fetch': True
                 }
                 if user_id:
                     res['allowed_user_ids'] = [(4, user_id.id, False)]

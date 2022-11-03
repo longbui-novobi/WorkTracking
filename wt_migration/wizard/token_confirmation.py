@@ -15,6 +15,6 @@ class TokenConfirmation(models.TransientModel):
         elif self.employee_id.user_id.id != self.env.user.id:
             raise exceptions.UserError("Cannot update token on other user")
         
-        self.employee_id.user_id.set_jira_token(self.token)
+        self.employee_id.update_token(self.token)
         self.update({'token': True})
         

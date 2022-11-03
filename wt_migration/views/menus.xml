@@ -4,6 +4,7 @@
               name="Migration"
               action="wt_migration.action_wt_migration"
               sequence="1"
+              groups="project_management.group_wt_admin"
               parent="project_management.settings">
     </menuitem>
 </odoo>
