@@ -195,6 +195,8 @@ class ImportingJiraSelfHostedWorkLog:
         self.author = ['updateAuthor', 'name']
         self.author_name = ['updateAuthor', 'displayName']
         self.issue_id = ['issueId']
+        self.create_date = ['created']
+        self.write_date = ['updated']
 
 
 class ImportingJiraCloudWorkLog:
@@ -207,6 +209,8 @@ class ImportingJiraCloudWorkLog:
         self.author = ['updateAuthor', 'emailAddress']
         self.author_name = ['updateAuthor', 'displayName']
         self.issue_id = ['issueId']
+        self.create_date = ['created']
+        self.write_date = ['updated']
 
 
 class Log:
@@ -219,6 +223,8 @@ class Log:
         self.author = load_from_key_paths(fields, map.author)
         self.author_name = load_from_key_paths(fields, map.author_name)
         self.remote_issue_id = int(load_from_key_paths(fields, map.issue_id))
+        self.create_date = load_from_key_paths(fields, map.create_date)
+        self.write_date = load_from_key_paths(fields, map.write_date)
 
 
 class ImportingJiraWorkLog:

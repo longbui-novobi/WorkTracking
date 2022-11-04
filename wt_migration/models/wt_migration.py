@@ -539,7 +539,9 @@ class TaskMigration(models.Model):
             'state': 'done',
             'source': 'sync',
             'issue_id': issue.get(log.remote_issue_id, False),
-            'is_exported': True
+            'is_exported': True,
+            'wt_create_date': self.convert_server_tz_to_utc(log.create_date),
+            'wt_write_date': self.convert_server_tz_to_utc(log.write_date),
         }
         return curd_data
 

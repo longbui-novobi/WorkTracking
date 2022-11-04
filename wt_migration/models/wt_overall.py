@@ -18,6 +18,8 @@ class WtTimeLog(models.Model):
 
     id_on_wt = fields.Integer(string='ID on Task')
     is_exported = fields.Boolean(string="Is Exported?", default=False)
+    wt_create_date = fields.Datetime(string="Wt Create On")
+    wt_write_date = fields.Datetime(string="Wt Update On")
 
     def batch_export(self, pivot_time):
         issue_ids = self.mapped('issue_id')
