@@ -46,8 +46,6 @@ def convert_log_format_to_second(log_data, employee_id):
         if not data.get(unit):
             raise AttributeError("Your format is incorrect")
         total_time += operand * data.get(unit, 0)
-    if float_is_zero(total_time, 3):
-        raise AttributeError("Nothing to log")
     return total_time
 
 
