@@ -584,6 +584,77 @@ class TaskMigration(models.Model):
             self.mapping_worklog(local, log, issue, response)
         return response
 
+    def load_missing_work_logs_by_unix(self, unix, users, projects, batch=900, end_unix=-1):
+        if self.import_work_log:
+            for user in users:
+                last_page = False
+                mapping = ImportingJiraWorkLog(self.server_type, self.wt_server_url)
+                headers = self.with_user(user).__get_request_headers()
+                issue_ids = self.env['wt.issue'].search([('project_id', 'in', projects.ids)])
+                local_data = {
+                    'dict_log': {},
+                    'dict_issue': {issue_id.wt_id: issue_id.id for issue_id in issue_ids},
+                    'dict_user': self.with_context(active_test=False).get_user()
+                }
+                flush = set()
+                to_create = []
+                request_data = {
+                    'endpoint': f"{self.wt_server_url}/worklog/updated?since={unix}",
+                }
+                page_failed_count = 0
+                page_break = False
+                while not last_page and page_failed_count < 6 and not page_break:
+                    body = self.make_request(request_data, headers)
+                    if isinstance(body, dict):
+                        page_failed_count = 0
+                        request_data['endpoint'] = body.get('nextPage', '')
+                        last_page = body.get('lastPage', True)
+                        ids = list(map(lambda r: r['worklogId'], body.get('values', [])))
+                        flush.update(ids)
+                        log_failed_count = 0
+                        while log_failed_count < 6:
+                            if len(flush) > batch or last_page:
+                                self.env.cr.execute("""
+                                    SELECT ARRAY_AGG(id_on_wt) AS result FROM wt_time_log WHERE id_on_wt IN %(ids)s AND project_id NOT IN %(project_ids)s
+                                """, {
+                                    'ids': tuple(flush),
+                                    'project_ids': tuple(projects.ids)
+                                })
+                                res = self.env.cr.dictfetchone()
+                                flush -= set(res['result'] or [])
+                                if len(flush):
+                                    request = {
+                                        'endpoint': f"{self.wt_server_url}/worklog/list",
+                                        'method': 'post',
+                                        'body': {'ids': list(flush)}
+                                    }
+                                    logs = self.make_request(request, headers)
+                                    if isinstance(logs, list):
+                                        log_failed_count = 0
+                                        data = {'worklogs': logs}
+                                        new_logs = self.processing_worklog_raw_data(local_data, data, mapping)
+                                        to_create.extend(new_logs.get('new'))
+                                        flush = set()
+                                        break
+                                    else:
+                                        _logger.warning(f"WORK LOG LOAD FAILED COUNT: {log_failed_count}")
+                                        log_failed_count += 1
+                                        time.sleep(30)
+                                        continue
+                                else:
+                                    break
+                        del body['values']
+                        if end_unix > 0 and end_unix > body.get('until', 0):
+                            last_page = True
+                        _logger.info(json.dumps(body, indent=4))
+                    else:
+                        _logger.warning(f"PAGE LOAD FAILED COUNT: {page_failed_count}")
+                        page_failed_count += 1
+                        time.sleep(30)
+                        continue
+                if len(to_create):
+                    self.env["wt.time.log"].with_context(bypass_rounding=True).create(to_create)
+
     def load_work_logs_by_unix(self, unix, users, batch=900, end_unix=-1):
         if self.import_work_log:
             for user in users:
@@ -785,7 +856,6 @@ class TaskMigration(models.Model):
         _logger.info(json.dumps(request_data, indent=4))
         issue_ids = self.do_request(request_data, load_all=True)
         _logger.info(f"{project_id.project_name}: {len(issue_ids)}")
-        self.load_work_logs(issue_ids, load_all=True)
 
     def update_project(self, project_id, user_id):
         _self = self.with_user(user_id)

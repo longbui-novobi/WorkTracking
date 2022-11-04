@@ -10,4 +10,7 @@ class ProjectGeneral(models.Model):
         if server_urls:
             server_urls = server_urls.split("\n")
             for url in server_urls:
-                requests.get(url.strip()+"/wakeup")
+                try:
+                    requests.get(url.strip()+"/wakeup")
+                except:
+                    continue

@@ -30,7 +30,7 @@ class ResUsers(models.Model):
                 _logger.warning("TOKEN UPDATE %s : %s"% (self.env.user.__str__(), str(e)))
                 continue
         if fetch_ok:
-            to_fetch_projects and to_fetch_projects.cron_fetch_issue(users=self.env.user)
+            to_fetch_projects and to_fetch_projects.load_new_project()
         else:
             raise UserError(_("The Token is invalid, please check again"))
 
