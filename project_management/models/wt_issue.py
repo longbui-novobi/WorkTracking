@@ -26,7 +26,7 @@ class WtProject(models.Model):
     time_log_ids = fields.One2many('wt.time.log', 'issue_id', string='Log Times')
     story_point = fields.Float(string='Estimate')
     story_point_unit = fields.Selection([('general', 'Fibonanci'), ('hrs', 'Hour(s)')], string="Estimate Unit", default="general")
-    project_id = fields.Many2one('wt.project', string='Project', required=True)
+    project_id = fields.Many2one('wt.project', string='Project', required=True, ondelete="cascade")
     assignee_id = fields.Many2one('res.users', string='Assignee')
     tester_id = fields.Many2one("res.users", string="Tester")
     issue_type_id = fields.Many2one("wt.type", string="Type")

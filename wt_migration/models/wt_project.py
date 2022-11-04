@@ -14,7 +14,7 @@ class WtProject(models.Model):
     allow_to_fetch = fields.Boolean("Should Fetch?")
  
     @api.model
-    def cron_fetch_issue(self, load_create=True):
+    def cron_fetch_issue(self, load_create=True, users=None):
         if not self:
             self = self.search([('allow_to_fetch', '=', True), ('wt_migration_id.active', '=', True)])
         latest_unix = int(self.env['ir.config_parameter'].get_param('latest_unix'))
@@ -25,7 +25,9 @@ class WtProject(models.Model):
             if project.wt_migration_id not in migration_dict:
                 migration_dict[project.wt_migration_id] = self.env['res.users']
             user_ids = self.env['res.users']
-            if project.wt_migration_id.is_round_robin and project.wt_migration_id.admin_user_ids:
+            if users:
+                user_ids = users
+            elif project.wt_migration_id.is_round_robin and project.wt_migration_id.admin_user_ids:
                 user_ids = allowed_user_ids & project.wt_migration_id.admin_user_ids
             elif project.allowed_user_ids:
                 user_ids = allowed_user_ids & project.allowed_user_ids

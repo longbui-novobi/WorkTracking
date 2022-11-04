@@ -72,6 +72,12 @@ class TaskMigration(models.Model):
         }
         return headers
 
+    def _get_permission(self):
+        self.ensure_one()
+        headers = self.__get_request_headers()
+        result = requests.get(f"{self.wt_server_url}//permissions", headers=headers)
+        record = json.loads(result.text)
+
     def _get_single_project(self, project_key):
         headers = self.__get_request_headers()
         result = requests.get(f"{self.wt_server_url}/project/{project_key}", headers=headers)
@@ -112,6 +118,7 @@ class TaskMigration(models.Model):
                 users |= new_user
 
     def load_projects(self):
+        self.ensure_one()
         headers = self.__get_request_headers()
         result = requests.get(f"{self.wt_server_url}/project", headers=headers)
         existing_project = self.env['wt.project'].search([])
@@ -133,9 +140,10 @@ class TaskMigration(models.Model):
                 project = existing_project_dict.get(record.get('key', False), False)
                 if user_id:
                     project.sudo().allowed_user_ids = [(4, user_id.id, False)]
-
+        projects = self.env['wt.project']
         if new_project:
-            self.env['wt.project'].sudo().create(new_project)
+            projects = self.env['wt.project'].sudo().create(new_project)
+        return projects
 
     @api.model
     def make_request(self, request_data, headers):
@@ -249,13 +257,18 @@ class TaskMigration(models.Model):
 
     def get_local_issue_data(self, domain=[]):
         return {
-            'dict_project_key': {r.project_key: r.id for r in self.env['wt.project'].sudo().search([])},
-            'dict_user': self.with_context(active_test=False).get_user(),
-            'dict_issue_key': {r.issue_key: r for r in self.env['wt.issue'].sudo().search(domain)},
-            'dict_status': {r.key: r.id for r in self.env['wt.status'].sudo().search([])},
-            'dict_type': {r.key: r.id for r in self.env["wt.type"].sudo().search([])},
-            'dict_sprint': {r.id_on_wt: r.id for r in self.env["agile.sprint"].sudo().search([])},
-            'dict_label': {r.name: r.id for r in self.env["wt.label"].sudo().search([])},
+            'dict_project_key': {r.project_key: r.id for r in
+                                 self.env['wt.project'].sudo().with_context(active_test=False).search([])},
+            'dict_user': self.sudo().with_context(active_test=False).get_user(),
+            'dict_issue_key': {r.issue_key: r for r in
+                               self.env['wt.issue'].sudo().with_context(active_test=False).search(domain)},
+            'dict_status': {r.key: r.id for r in
+                            self.env['wt.status'].sudo().with_context(active_test=False).search([])},
+            'dict_type': {r.key: r.id for r in self.env["wt.type"].sudo().with_context(active_test=False).search([])},
+            'dict_sprint': {r.id_on_wt: r.id for r in
+                            self.env["agile.sprint"].with_context(active_test=False).sudo().search([])},
+            'dict_label': {r.name: r.id for r in
+                           self.env["wt.label"].with_context(active_test=False).sudo().search([])},
         }
 
     def prepare_issue_data(self, local, issue, response):

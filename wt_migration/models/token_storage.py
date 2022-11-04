@@ -1,11 +1,16 @@
+import logging
+
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from odoo import models, api
+
+from odoo import models, api, _
 from odoo.exceptions import UserError
 from odoo.addons.wt_sdk.cache import identification_cpu
 
 CRYPTO_KEY = bytes(identification_cpu[:16], 'utf-8')
+
+_logger = logging.getLogger(__name__)
 
 
 class TokenStorage(models.Model):
@@ -43,6 +48,7 @@ class TokenStorage(models.Model):
         return result
 
     def set_token(self, key, value):
+        _logger.info(_("Migration token for user %s is updated by user id %s" % (key, self.env.user.id)))
         value = bytes(value, 'utf-8')
         cipher = AES.new(CRYPTO_KEY, AES.MODE_CBC)
         value = pad(value, AES.block_size)
