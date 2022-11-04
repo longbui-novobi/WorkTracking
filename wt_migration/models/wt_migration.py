@@ -328,8 +328,12 @@ class TaskMigration(models.Model):
         to_create_projects = [issue.project_key for issue in issues if
                               issue.project_key not in local['dict_project_key']]
         if len(to_create_projects):
+            new_projects = self.env['wt.project']
             for project in to_create_projects:
-                local['dict_project_key'][project] = self._get_single_project(project_key=project)
+                new_project = self._get_single_project(project_key=project)
+                local['dict_project_key'][project] = new_project
+                new_projects |= new_project
+            new_projects.cron_fetch_issue(users=self.env.user)
 
     def create_missing_users(self, issues, local):
         processed = set()
