@@ -5,14 +5,12 @@ import logging
 import base64
 import time
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 from odoo.addons.project_management.utils.search_parser import get_search_request
 from odoo.addons.wt_migration.utils.ac_parsing import parsing, unparsing
 from odoo.addons.wt_migration.models.mapping_table import IssueMapping, WorkLogMapping, ACMapping
 from odoo.addons.wt_sdk.jira.import_jira_formatter import ImportingJiraIssue, ImportingJiraWorkLog
 from odoo.addons.base.models.res_partner import _tz_get
-from odoo.fields import Command
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -185,7 +183,7 @@ class TaskMigration(models.Model):
                             del curd_data[keys[index]]
                     elif not (set([x[1] for x in curd_data[keys[index]]]) - set(value.ids)):
                         del curd_data[keys[index]]
-                elif isinstance(value, datetime):
+                elif isinstance(value, datetime) or isinstance(curd_data[keys[index]], datetime):
                     if value and value.isoformat()[:16] == curd_data[keys[index]].isoformat()[:16]:
                         del curd_data[keys[index]]
                 elif isinstance(value, str):
