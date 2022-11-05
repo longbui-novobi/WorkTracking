@@ -87,7 +87,7 @@ class TaskMigration(models.Model):
             'allow_to_fetch': True,
             'allowed_user_ids': [(4, self.env.user.id, False)]
         }
-        return self.env['wt.project'].sudo().create(res).id
+        return self.env['wt.project'].sudo().create(res)
 
     def _get_current_employee(self):
         return {
@@ -329,7 +329,7 @@ class TaskMigration(models.Model):
             new_projects = self.env['wt.project']
             for project in to_create_projects:
                 new_project = self._get_single_project(project_key=project)
-                local['dict_project_key'][project] = new_project
+                local['dict_project_key'][project] = new_project.id
                 new_projects |= new_project
             new_projects.cron_fetch_issue(users=self.env.user)
 
