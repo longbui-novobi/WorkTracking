@@ -279,8 +279,8 @@ class TaskMigration(models.Model):
             'wt_migration_id': self.id,
             'wt_id': issue.remote_id,
             'project_id': local['dict_project_key'].get(issue.project_key),
-            'assignee_id': local['dict_user'].get(issue.assignee_email),
-            'tester_id': local['dict_user'].get(issue.tester_email),
+            'assignee_id': local['dict_user'].get(issue.assignee_email or issue.assignee_accountId),
+            'tester_id': local['dict_user'].get(issue.tester_email or issue.tester_accountId),
             'status_id': local['dict_status'].get(issue.status_key),
             'issue_type_id': local['dict_type'].get(issue.issue_type_key)
         }
@@ -334,22 +334,21 @@ class TaskMigration(models.Model):
             new_projects.cron_fetch_issue(users=self.env.user)
 
     def create_missing_users(self, issues, local):
-        processed = set()
-        to_create_users = [(issue.assignee_email, issue.assignee_name) for issue in issues if
-                           issue.assignee_email and issue.assignee_email not in local['dict_user']]
-        to_create_users += [(issue.tester_email, issue.tester_name) for issue in issues if
-                            issue.tester_email and issue.tester_email not in local['dict_user']]
+        processed = set([False, None])
+        to_create_users = [(issue.assignee_email, issue.assignee_name, issue.assignee_accountId) for issue in issues if (issue.assignee_email or issue.assignee_accountId) not in local['dict_user']]
+        to_create_users += [(issue.tester_email, issue.tester_name, issue.tester_accountId) for issue in issues if (issue.assignee_email or issue.tester_accountId) not in local['dict_user']]
         for user in to_create_users:
-            if user[0] not in processed:
+            login = user[0] or user[2]
+            if login not in processed:
                 new_user = self.env['res.users'].sudo().create({
-                    'login': user[0],
+                    'login': login,
                     'name': user[1],
                     'active': False
                 })
-                new_user.partner_id.email = user[0]
+                new_user.partner_id.email = login
                 new_user.action_create_employee()
-                local['dict_user'][user[0]] = new_user.id
-                processed.add(user[0])
+                local['dict_user'][login] = new_user.id
+                processed.add(login)
 
     def create_missing_statuses(self, issues, local):
         for issue in issues:
@@ -527,9 +526,9 @@ class TaskMigration(models.Model):
         }
 
     def prepare_worklog_data(self, local, log, issue, response):
-        user_id = log.author and local['dict_user'][log.author] or False
+        user_id = local['dict_user'].get(log.author or log.author_accountId, False)
         if not user_id:
-            _logger.info("MISSING ASSIGNEE: wt.issue(%s)" %issue.get(log.remote_issue_id, False))
+            _logger.info("MISSING ASSIGNEE: wt.issue(%ss)" %issue.get(log.remote_issue_id, False))
         curd_data = {
             'time': log.time,
             'duration': log.duration,
@@ -560,17 +559,20 @@ class TaskMigration(models.Model):
                 response['updated'] |= existing_log
 
     def create_missing_assignee(self, logs, local):
-        processed = set()
-        to_create_users = [(log.author, log.author_name) for log in logs if
-                           log.author and log.author not in local['dict_user']]
+        processed = set([False, None])
+        to_create_users = [(log.author, log.author_name, log.author_accountId) for log in logs if (log.author or log.author_accountId) not in local['dict_user']]
         for user in to_create_users:
-            if user[0] not in processed:
-                local['dict_user'][user[0]] = self.env['res.users'].sudo().create({
-                    'login': user[0],
+            login = user.author or user.author_accountId
+            if login not in processed:
+                new_user = self.env['res.users'].sudo().create({
+                    'login': login,
                     'name': user[1],
                     'active': False
-                }).id
-                processed.add(user[0])
+                })
+                new_user.partner_id.email = login
+                new_user.action_create_employee()
+                local['dict_user'][login] = new_user.id
+                processed.add(login)
 
     def processing_worklog_raw_data(self, local, raw, mapping):
         if not mapping:

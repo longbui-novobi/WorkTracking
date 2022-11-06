@@ -70,8 +70,10 @@ class Issue:
         self.project_key = load_from_key_paths(issue_fields, map.project)
         self.assignee_email = load_from_key_paths(issue_fields, map.assignee)
         self.assignee_name = load_from_key_paths(issue_fields, map.assignee_name)
+        self.assignee_accountId = load_from_key_paths(issue_fields, map.assignee_accountId)
         self.tester_email = load_from_key_paths(issue_fields, map.tester)
         self.tester_name = load_from_key_paths(issue_fields, map.tester_name)
+        self.tester_accountId = load_from_key_paths(issue_fields, map.tester_accountId)
         self.issue_type_key = load_from_key_paths(issue_fields, map.issue_type)
         self.raw_type = load_from_key_paths(issue_fields, map.new_issue_key)
         self.remote_status_id = load_from_key_paths(issue_fields, map.status_id)
@@ -101,8 +103,10 @@ class ImportJiraCloudIssue:
         self.estimate_hour = ['customfield_10056']
         self.assignee = ['assignee', 'emailAddress']
         self.assignee_name = ['assignee', 'displayName']
+        self.assignee_accountId = ['assignee', 'accountId']
         self.tester = ['customfield_11101', 'name']
         self.tester_name = ['customfield_11101', 'displayName']
+        self.tester_accountId = ['customfield_11101', 'accountId']
         self.project = ['project', 'key']
         self.issue_type = ['issuetype', 'id']
         self.summary = ['summary']
@@ -208,6 +212,7 @@ class ImportingJiraCloudWorkLog:
         self.start_date = ['started']
         self.author = ['updateAuthor', 'emailAddress']
         self.author_name = ['updateAuthor', 'displayName']
+        self.author_accountId = ['updateAuthor', 'accountId']
         self.issue_id = ['issueId']
         self.create_date = ['created']
         self.write_date = ['updated']
@@ -222,6 +227,7 @@ class Log:
         self.start_date = load_from_key_paths(fields, map.start_date)
         self.author = load_from_key_paths(fields, map.author)
         self.author_name = load_from_key_paths(fields, map.author_name)
+        self.author_accountId = load_from_key_paths(fields, map.author_accountId)
         self.remote_issue_id = int(load_from_key_paths(fields, map.issue_id))
         self.create_date = load_from_key_paths(fields, map.create_date)
         self.write_date = load_from_key_paths(fields, map.write_date)
