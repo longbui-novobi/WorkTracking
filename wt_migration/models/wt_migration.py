@@ -562,7 +562,7 @@ class TaskMigration(models.Model):
         processed = set([False, None])
         to_create_users = [(log.author, log.author_name, log.author_accountId) for log in logs if (log.author or log.author_accountId) not in local['dict_user']]
         for user in to_create_users:
-            login = user.author or user.author_accountId
+            login = user[0] or user[2]
             if login not in processed:
                 new_user = self.env['res.users'].sudo().create({
                     'login': login,
