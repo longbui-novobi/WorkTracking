@@ -527,13 +527,16 @@ class TaskMigration(models.Model):
         }
 
     def prepare_worklog_data(self, local, log, issue, response):
+        user_id = log.author and local['dict_user'][log.author] or False
+        if not user_id:
+            _logger.info("MISSING ASSIGNEE: wt.issue(%s)" %issue.get(log.remote_issue_id, False))
         curd_data = {
             'time': log.time,
             'duration': log.duration,
             'description': log.description or '',
             'id_on_wt': log.remote_id,
             'start_date': self.convert_server_tz_to_utc(log.start_date),
-            'user_id': log.author and local['dict_user'][log.author] or False,
+            'user_id': user_id,
             'state': 'done',
             'source': 'sync',
             'issue_id': issue.get(log.remote_issue_id, False),
