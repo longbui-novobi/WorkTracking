@@ -876,9 +876,9 @@ class TaskMigration(models.Model):
                 '%Y-%m-%d %H:%M')
             params = f"""jql=updated >= '{str_updated_date}'"""
             request_data = {'endpoint': f"{self.wt_server_url}/search", "params": [params]}
+            _logger.info(json.dumps(request_data, indent=4))
             issue_ids = self.do_request(request_data, load_all=True)
             _logger.info(f"Batch Load Of User {user.display_name}: {len(issue_ids)}")
-            _logger.info(",".join(issue_ids.mapped('issue_key')))
 
     def update_boards(self):
         project_ids = self.env["wt.project"].sudo().search([])
