@@ -34,7 +34,7 @@ class WtProject(models.Model):
                 user_ids = project.wt_migration_id.admin_user_ids
             if (not project.last_update or project.last_update.timestamp() * 1000 < latest_unix) and user_ids and project.wt_migration_id:
                 new_projects_by_user[user_ids[0]] |= project
-            project.last_update = checkpoint_unix
+            project.sudo().last_update = checkpoint_unix
         
         if new_projects_by_user:
             for user, projects in new_projects_by_user.items():
@@ -56,7 +56,7 @@ class WtProject(models.Model):
             for project in projects:
                 migration_id.with_delay()._update_project(project, project.last_update)
             migration_id.with_delay(eta=1).load_missing_work_logs_by_unix(0, self.env.user, projects)
-            projects.last_update = last_updated
+            projects.sudo().last_update = last_updated
 
     def reset_state(self):
         for record in self:

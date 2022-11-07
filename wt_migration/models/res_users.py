@@ -25,7 +25,7 @@ class ResUsers(models.Model):
         for migration in self.env['wt.migration'].search([]):
             try:
                 migration._get_permission()
-                to_fetch_projects |= migration.sudo().load_projects()
+                to_fetch_projects |= migration.load_projects()
                 fetch_ok = True
             except Exception as e:
                 _logger.warning("TOKEN UPDATE %s : %s"% (self.env.user.__str__(), str(e)))
