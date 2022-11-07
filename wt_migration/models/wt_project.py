@@ -61,3 +61,9 @@ class WtProject(models.Model):
     def reset_state(self):
         for record in self:
             record.last_update = False
+
+    @api.model_create_multi
+    def create(self, value_list):
+        res = super().create(value_list)
+        _logger.info("NEW PROJECT: %s" % res.mapped('project_key'))
+        return res
