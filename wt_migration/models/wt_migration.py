@@ -331,7 +331,7 @@ class TaskMigration(models.Model):
                 new_project = self._get_single_project(project_key=project)
                 local['dict_project_key'][project] = new_project.id
                 new_projects |= new_project
-            new_projects.cron_fetch_issue(users=self.env.user)
+            new_projects.cron_fetch_issue()
 
     def create_missing_users(self, issues, local):
         processed = set([False, None])
