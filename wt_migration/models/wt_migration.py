@@ -323,14 +323,17 @@ class TaskMigration(models.Model):
                 existing_issue.write(curd_data)
 
     def create_missing_projects(self, issues, local):
+        processed = set([False, None])
         to_create_projects = [issue.project_key for issue in issues if
                               issue.project_key not in local['dict_project_key']]
         if len(to_create_projects):
             new_projects = self.env['wt.project']
             for project in to_create_projects:
-                new_project = self._get_single_project(project_key=project)
-                local['dict_project_key'][project] = new_project.id
-                new_projects |= new_project
+                if project not in processed:
+                    new_project = self._get_single_project(project_key=project)
+                    local['dict_project_key'][project] = new_project.id
+                    new_projects |= new_project
+                    processed.add(project)
             new_projects.cron_fetch_issue()
 
     def create_missing_users(self, issues, local):
