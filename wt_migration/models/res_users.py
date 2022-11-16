@@ -34,7 +34,7 @@ class ResUsers(models.Model):
             to_fetch_projects and to_fetch_projects.sudo().load_new_project()
         else:
             raise UserError(_("The Token is invalid, please check again"))
-        self.env['ir.config_parameter'].set_param('latest_unix', int(datetime.now().timestamp() * 1000))
+        self.env['ir.config_parameter'].sudo().set_param('latest_unix', int(datetime.now().timestamp() * 1000))
 
     def token_exists(self):
         existing_token_users = self.env['res.users']
