@@ -44,4 +44,4 @@ class ResUsers(models.Model):
                 existing_token_users |= user
             except:
                 continue
-        return existing_token_users
+        return existing_token_users 
