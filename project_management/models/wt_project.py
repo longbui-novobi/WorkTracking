@@ -28,6 +28,12 @@ class WtProject(models.Model):
             res.append((project.id, name))
         return res
 
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        if len(name):
+            args = ['|', ('project_name', 'ilike', name), ('project_key', 'ilike', name)]
+        return super().name_search(name, args, operator, limit)
+
     def fetch_user_from_issue(self):
         for record in self:
             user_ids = self.env['wt.issue'] \
