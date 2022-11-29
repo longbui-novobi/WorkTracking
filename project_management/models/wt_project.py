@@ -86,3 +86,13 @@ class WtProject(models.Model):
         sheet.write(0, 0, self.display_name, header_format)
         sheet.write(1, 0, self.project_key, text_format)
         return workbook
+
+    def write(self, values):
+        res = super().write(values)
+        if len(values.get('allowed_manager_ids', [])):
+            new_record = self.new(values)
+            for record in self:
+                new_users = new_record.allowed_manager_ids - record.allowed_user_ids
+                if (new_users):
+                    record.allowed_user_ids = [fields.Command.link(user._origin.id) for user in new_users]
+        return res
