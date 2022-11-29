@@ -33,7 +33,7 @@ class WtTimeLog(models.Model):
 
     def write(self, values):
         res = super().write(values)
-        if 'is_exported' not in values:
+        if 'is_exported' not in values or not self._context.get('bypass_exporting_check'):
             employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1)
             for record in self:
                 if record.issue_id.wt_migration_id.auto_export_work_log and employee_id.auto_export_work_log:
