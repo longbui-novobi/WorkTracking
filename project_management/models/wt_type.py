@@ -11,3 +11,4 @@ class WtType(models.Model):
     img_url = fields.Char(string="Image URL")
     img_base64 = fields.Char(string="Image Base64")
     key = fields.Char(string='Task Key')
+    default_personal = fields.Boolean(string="Personal default")

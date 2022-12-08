@@ -2,6 +2,7 @@ import datetime
 import json
 import pytz
 import logging
+from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
 from odoo.osv import expression
 from odoo.addons.project_management.utils.search_parser import get_search_request
@@ -52,6 +53,8 @@ class WtProject(models.Model):
     sprint_id = fields.Many2one("agile.sprint", string="Sprint")
     sprint_key = fields.Integer(string="Sprint ID on WT")
     label_ids = fields.Many2many("wt.label", string="Labels")
+    applicable_date = fields.Date(string="Applicable Date", default=fields.Date.context_today)
+    personal = fields.Boolean(string="Is Personal", default=False)
 
     @api.depends("duration")
     def _compute_duration_hrs(self):
@@ -276,13 +279,33 @@ class WtProject(models.Model):
             active_issue_ids = active_issue_ids[:values['limit']]
         return active_issue_ids
 
+    def get_daily_tasks(self, date):
+        user_date = date.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(self.env.user.tz or "UTC")).date()
+        issue = self.search([('project_id.personal_id', '=', self.env.user.id), ('applicable_date', '=', user_date)], limit=1) 
+        if not issue:
+            project = self.env['wt.project'].gather_personal_project()
+            issue = self.create({
+                'issue_name': "Task: %s" % user_date.strftime("%B %d, %Y"),
+                'issue_key': project.project_key + "-%s"% user_date.strftime("%m%d%y"),
+                'issue_sequence': user_date.year + user_date.month + user_date.day,
+                'project_id': project.id,
+                'assignee_id': self.env.user.id,
+                'issue_type_id': self.env['wt.type'].search([('default_personal', '=', True)], limit=1).id,
+                'personal': True,
+                'applicable_date': user_date
+            })
+        return [('id', '=', issue.id)]
+
     def generate_special_search(self, res, employee):
         if 'chain' in res:
             pass
 
     def get_search_issue_domain(self, res, employee):
         domain = []
-        print(res)
+        if 'today' in res:
+            return self.get_daily_tasks(datetime.datetime.now())
+        if 'tomorrow' in res:
+            return self.get_daily_tasks(datetime.datetime.now() + relativedelta(days=1))
         if 'issue' in res:
             domain = expression.AND([domain, [('issue_key', 'ilike', res['issue'])]])
         if 'project' in res:
@@ -309,7 +332,7 @@ class WtProject(models.Model):
             user_ids = self.env['res.users'].with_context(active_test=False).sudo().search(
                 ['|', ('login', 'ilike', res['name']), ('partner_id.email', 'ilike', res['name'])])
             domain = expression.AND([domain, ['|', ('assignee_id', 'in', user_ids.ids), ('tester_id', 'in', user_ids.ids)]])
-        return domain
+        return expression.AND([domain, [('personal', '=', False)]])
 
     def search_issue_by_criteria(self, payload):
         employee = self._get_result_management()

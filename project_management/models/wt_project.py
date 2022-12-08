@@ -19,6 +19,7 @@ class WtProject(models.Model):
     chain_work_ids = fields.One2many("wt.chain.work.session", "project_id", "Chain Works")
     board_ids = fields.One2many('board.board', 'project_id', string="Boards")
     sprint_ids = fields.One2many('agile.sprint', 'project_id', string="Sprints")
+    personal_id = fields.Many2one("res.users", string="Personal Board User")
 
     def name_get(self):
         res = []
@@ -96,3 +97,14 @@ class WtProject(models.Model):
                 if (new_users):
                     record.allowed_user_ids = [fields.Command.link(user._origin.id) for user in new_users]
         return res
+
+    def gather_personal_project(self):
+        project = self.search([('personal_id', '=', self.env.user.id)])
+        if not project:
+            board_name = self.env.user.name or self.env.user.employee_id.name
+            project = self.create({
+                'project_name': "PERSONAL: " + board_name,
+                'project_key': "PER" + "".join([x[0] for x in board_name.split(' ') if len(x)]),
+                'personal_id': self.env.user.id
+            })
+        return project
