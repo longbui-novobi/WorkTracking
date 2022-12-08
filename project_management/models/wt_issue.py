@@ -332,7 +332,7 @@ class WtProject(models.Model):
             user_ids = self.env['res.users'].with_context(active_test=False).sudo().search(
                 ['|', ('login', 'ilike', res['name']), ('partner_id.email', 'ilike', res['name'])])
             domain = expression.AND([domain, ['|', ('assignee_id', 'in', user_ids.ids), ('tester_id', 'in', user_ids.ids)]])
-        return expression.AND([domain, [('personal', '=', False)]])
+        return expression.AND([domain, ['|', ('personal', '=', False), ('project_id.personal_id', '=', self.env.user.id)]])
 
     def search_issue_by_criteria(self, payload):
         employee = self._get_result_management()
@@ -377,3 +377,6 @@ class WtProject(models.Model):
                 'sequence': record.sequence
             })
         return res
+
+
+    # ========================= CURD =========================
