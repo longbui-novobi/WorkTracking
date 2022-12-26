@@ -283,7 +283,7 @@ class WtProject(models.Model):
         user_date = date.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(self.env.user.tz or "UTC")).date()
         issue = self.search([('project_id.personal_id', '=', self.env.user.id), ('applicable_date', '=', user_date)], limit=1) 
         if not issue:
-            project = self.env['wt.project'].gather_personal_project()
+            project = self.env['wt.project'].sudo().gather_personal_project()
             issue = self.create({
                 'issue_name': "Task: %s" % user_date.strftime("%B %d, %Y"),
                 'issue_key': project.project_key + "-%s"% user_date.strftime("%m%d%y"),
