@@ -306,6 +306,22 @@ class WtProject(models.Model):
             return self.get_daily_tasks(datetime.datetime.now())
         if 'tomorrow' in res:
             return self.get_daily_tasks(datetime.datetime.now() + relativedelta(days=1))
+        if 'personal' in res:
+            query = res.get("personal")
+            if "-" in query:
+                query = query.replace("-", "/")
+            user_dt = None
+            for fmt in ("%d/%m/%Y", "%d/%m/%y", "%m/%d/%Y", "%m/%d/%y", "%Y/%m/%d", "%y/%m/%d"):
+                try:
+                    user_dt = datetime.datetime.strptime(query, fmt)
+                    break
+                except ValueError:
+                    continue
+            if user_dt:
+                user_dt = user_dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(self.env.user.tz or "UTC"))
+                return self.get_daily_tasks(user_dt)
+            else:
+                return [('id', '=', 0)]
         if 'issue' in res:
             domain = expression.AND([domain, [('issue_key', 'ilike', res['issue'])]])
         if 'project' in res:
