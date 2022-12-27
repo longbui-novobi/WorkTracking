@@ -52,7 +52,7 @@ class WtIssue(http.Controller):
                 'type_url': issue_id.issue_type_id.img_url,
                 'type_name': issue_id.issue_type_id.name,
                 'sprint': issue_id.sprint_id.name,
-                'applicable_date': issue_id.applicable_date
+                'applicable_date': issue_id.applicable_date.isoformat()
             })
         return res
 
