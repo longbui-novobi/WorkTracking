@@ -22,7 +22,7 @@ class ResUsers(models.Model):
     def load_jira_projects(self):
         to_fetch_projects = self.env['wt.project']
         fetch_ok = False
-        for migration in self.env['wt.migration'].search([]):
+        for migration in self.env['wt.migration'].sudo().search([]):
             try:
                 migration._get_permission()
                 to_fetch_projects |= migration.load_projects()

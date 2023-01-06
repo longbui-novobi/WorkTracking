@@ -8,6 +8,7 @@ def handling_req_res(func):
     @functools.wraps(func)
     def wrapper_func(*args, **kwargs):
         try:
+            request.env.user._update_last_login()
             return func(*args, **kwargs)
         except Exception as e:
             _logger.warning(e)
