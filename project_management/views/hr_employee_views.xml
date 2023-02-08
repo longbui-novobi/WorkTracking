@@ -13,6 +13,7 @@
                         <field name="maximum_relative_result"/>
                         <field name="order_style"/>
                         <field name="rouding_up"/>
+                        <field name="default_nbr_days"/>
                         <field name="todo_transition"/>
                         <field name="move_threshold" attrs="{'invisible': [['todo_transition','=',False]]}"/>
                     </group>
@@ -36,6 +37,9 @@
                         <field name="maximum_relative_result"/>
                         <field name="order_style"/>
                         <field name="rouding_up"/>
+                        <field name="default_nbr_days"/>
+                        <field name="todo_transition"/>
+                        <field name="move_threshold" attrs="{'invisible': [['todo_transition','=',False]]}"/>
                     </group>
                 </page>
             </xpath>
