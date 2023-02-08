@@ -3,6 +3,7 @@ import json
 import pytz
 import logging
 from dateutil.relativedelta import relativedelta
+from collections import defaultdict
 from odoo import api, fields, models, _
 from odoo.osv import expression
 from odoo.addons.project_management.utils.search_parser import get_search_request
@@ -56,6 +57,14 @@ class WtProject(models.Model):
     applicable_date = fields.Date(string="Applicable Date", default=fields.Date.context_today)
     personal = fields.Boolean(string="Is Personal", default=False)
 
+    def name_get(self):
+        # Prefetch the fields used by the `name_get`, so `browse` doesn't fetch other fields
+        self.browse(self.ids).read(['issue_key', 'issue_name'])
+        return [(template.id, '%s: %s' % (template.issue_key and template.issue_key or '', template.issue_name))
+                for template in self]
+
+    #==================================================== API METHOD ==================================================================
+
     @api.depends("duration")
     def _compute_duration_hrs(self):
         for record in self:
@@ -80,12 +89,6 @@ class WtProject(models.Model):
                     record.last_start = suitable_record.start
                     continue
             record.last_start = False
-
-    def name_get(self):
-        # Prefetch the fields used by the `name_get`, so `browse` doesn't fetch other fields
-        self.browse(self.ids).read(['issue_key', 'issue_name'])
-        return [(template.id, '%s: %s' % (template.issue_key and template.issue_key or '', template.issue_name))
-                for template in self]
 
     @api.depends("duration")
     def _compute_duration_in_text(self):
@@ -279,23 +282,6 @@ class WtProject(models.Model):
             active_issue_ids = active_issue_ids[:values['limit']]
         return active_issue_ids
 
-    def get_daily_tasks(self, date):
-        user_date = date.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(self.env.user.tz or "UTC")).date()
-        issue = self.search([('project_id.personal_id', '=', self.env.user.id), ('applicable_date', '=', user_date)], limit=1) 
-        if not issue:
-            project = self.env['wt.project'].sudo().gather_personal_project()
-            issue = self.sudo().create({
-                'issue_name': "Task: %s" % user_date.strftime("%B %d, %Y"),
-                'issue_key': project.project_key + "-%s"% user_date.strftime("%m%d%y"),
-                'issue_sequence': user_date.year + user_date.month + user_date.day,
-                'project_id': project.id,
-                'assignee_id': self.env.user.id,
-                'issue_type_id': self.env['wt.type'].search([('default_personal', '=', True)], limit=1).id,
-                'personal': True,
-                'applicable_date': user_date
-            })
-        return [('id', '=', issue.id)]
-
     def generate_special_search(self, res, employee):
         if 'chain' in res:
             pass
@@ -396,3 +382,42 @@ class WtProject(models.Model):
 
 
     # ========================= CURD =========================
+
+    # ========================= AUTOMATE ACTION ==============
+    def get_daily_tasks(self, date):
+            user_date = date.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(self.env.user.tz or "UTC")).date()
+            issue = self.search([('project_id.personal_id', '=', self.env.user.id), ('applicable_date', '=', user_date)], limit=1) 
+            if not issue:
+                project = self.env['wt.project'].sudo().gather_personal_project()
+                issue = self.sudo().create({
+                    'issue_name': "Task: %s" % user_date.strftime("%B %d, %Y"),
+                    'issue_key': project.project_key + "-%s"% user_date.strftime("%m%d%y"),
+                    'issue_sequence': user_date.year + user_date.month + user_date.day,
+                    'project_id': project.id,
+                    'assignee_id': self.env.user.id,
+                    'issue_type_id': self.env['wt.type'].search([('default_personal', '=', True)], limit=1).id,
+                    'personal': True,
+                    'applicable_date': user_date
+                })
+            return [('id', '=', issue.id)]
+
+    @api.model
+    def _personal_todo_move(self):
+        yesterday_issues = self.search([('personal', '=', True), ('applicable_date', '=', fields.Date.context_today(self) - relativedelta(days=1))])
+        today_issues = self.search([('personal', '=', True), ('applicable_date', '=', fields.Date.context_today(self))])
+        empty_daily_issue_user_ids = yesterday_issues.assignee_id - today_issues.assignee_id
+        for user in empty_daily_issue_user_ids:
+            _self = self.with_user(user)
+            _self.get_daily_tasks(fields.Date.context_today(_self))
+        today_issues = self.search([('personal', '=', True), ('applicable_date', '=', fields.Date.context_today(self))])
+        today_issue_by_user = {issue.user_id.id: issue for issue in today_issues}
+        if yesterday_issues:
+            checklists = self.env['wt.ac'].search([('issue_id','in', yesterday_issues.ids)])
+            checklists_by_issue = defaultdict(self.env['wt.ac'])
+            for checklist in checklists:
+                checklists_by_issue[checklist.issue_id] |= checklist
+            for issue, checklists in checklists_by_issue.items():
+                if checklists and issue:
+                    today_issue = today_issue_by_user.get(issue.assignee_id)
+                    if today_issue:
+                        checklists.issue_id = today_issue.id

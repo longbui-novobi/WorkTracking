@@ -13,6 +13,7 @@
         'data/project_data.xml',
         'data/digest_email_template.xml',
         'data/system_data.xml',
+        'data/cron_tasks.xml',
 
         'security/wt_security.xml',
         'security/ir.model.access.csv',

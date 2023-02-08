@@ -20,3 +20,5 @@ class HREmployee(models.AbstractModel):
                                      ('h', 'Hour'),
                                      ('d', 'Day'),
                                      ('w', 'Week')], string="Default Log Unit", required=True, default="m")
+    todo_transition = fields.Boolean(string="Move Personal TODO to next date?", default=True)
+    move_threshold = fields.Integer(string="Maximum TODO alive", default=7)
