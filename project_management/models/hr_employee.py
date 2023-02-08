@@ -24,6 +24,7 @@ class HREmployee(models.AbstractModel):
     todo_transition = fields.Boolean(string="Move Personal TODO to next date?", default=True)
     move_threshold = fields.Integer(string="Maximum TODO alive", default=7)
     default_nbr_days = fields.Integer(string="Default Show Tracking Last (days)", default=7)
+    maximum_connection = fields.Integer(string="Maximum Extension Connection", default=4)
 
     @api.constrains('default_nbr_days')
     def _check_default_nbr_days(self):
