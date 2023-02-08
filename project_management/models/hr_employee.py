@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class HREmployee(models.AbstractModel):
@@ -22,3 +23,10 @@ class HREmployee(models.AbstractModel):
                                      ('w', 'Week')], string="Default Log Unit", required=True, default="m")
     todo_transition = fields.Boolean(string="Move Personal TODO to next date?", default=True)
     move_threshold = fields.Integer(string="Maximum TODO alive", default=7)
+    default_nbr_days = fields.Integer(string="Default Show Tracking Last (days)", default=7)
+
+    @api.constrains('default_nbr_days')
+    def _check_default_nbr_days(self):
+        for record in self:
+            if record.default_nbr_days > 14 or record.default_nbr_days <= 0:
+                raise UserError("Default Show Tracking must be less than 14 and greater than 0")
