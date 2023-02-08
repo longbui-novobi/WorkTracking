@@ -13,8 +13,6 @@
                             <field name="default_unit"/>
                             <field name="todo_transition"/>
                             <field name="move_threshold" attrs="{'invisible': [['todo_transition','=',False]]}"/>
-                            <field name="auto_remove_access"/>
-                            <field name="maximum_connection" attrs="{'invisible': [('auto_remove_access', '=', False)]}"/>
                         </group>
                     </group>
                     <group>
@@ -23,6 +21,10 @@
                             <field name="maximum_search_result"/>
                             <field name="maximum_relative_result"/>
                             <field name="default_nbr_days"/>
+                        </group>
+                        <group string="Extension Access">
+                            <field name="auto_remove_access"/>
+                            <field name="maximum_connection" attrs="{'invisible': [('auto_remove_access', '=', False)]}"/>
                         </group>
                     </group>
                 </page>
@@ -37,15 +39,14 @@
         <field name="model">hr.employee.public</field>
         <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook[1]" position="inside">
+           <xpath expr="//notebook[1]" position="inside">
                 <page string="Task Configurations">
                     <group>
-                        <group string="General Settings">
+                        <group string="General Settings" name="general_settings">
                             <field name="rouding_up"/>
                             <field name="default_unit"/>
                             <field name="todo_transition"/>
                             <field name="move_threshold" attrs="{'invisible': [['todo_transition','=',False]]}"/>
-                            <field name="maximum_connection" attrs="{'invisible': [('auto_remove_access', '=', False)]}"/>
                         </group>
                     </group>
                     <group>
@@ -54,6 +55,10 @@
                             <field name="maximum_search_result"/>
                             <field name="maximum_relative_result"/>
                             <field name="default_nbr_days"/>
+                        </group>
+                        <group string="Extension Access">
+                            <field name="auto_remove_access"/>
+                            <field name="maximum_connection" attrs="{'invisible': [('auto_remove_access', '=', False)]}"/>
                         </group>
                     </group>
                 </page>
