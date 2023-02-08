@@ -410,7 +410,7 @@ class WtProject(models.Model):
             _self = self.with_user(user)
             _self.get_daily_tasks(fields.Date.context_today(_self))
         today_issues = self.search([('personal', '=', True), ('applicable_date', '=', fields.Date.context_today(self))])
-        today_issue_by_user = {issue.user_id.id: issue for issue in today_issues}
+        today_issue_by_user = {issue.assignee_id.id: issue for issue in today_issues}
         if yesterday_issues:
             checklists = self.env['wt.ac'].search([('issue_id','in', yesterday_issues.ids)])
             checklists_by_issue = defaultdict(self.env['wt.ac'])
