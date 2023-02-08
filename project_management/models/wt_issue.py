@@ -284,7 +284,7 @@ class WtProject(models.Model):
         issue = self.search([('project_id.personal_id', '=', self.env.user.id), ('applicable_date', '=', user_date)], limit=1) 
         if not issue:
             project = self.env['wt.project'].sudo().gather_personal_project()
-            issue = self.create({
+            issue = self.sudo().create({
                 'issue_name': "Task: %s" % user_date.strftime("%B %d, %Y"),
                 'issue_key': project.project_key + "-%s"% user_date.strftime("%m%d%y"),
                 'issue_sequence': user_date.year + user_date.month + user_date.day,
