@@ -7,9 +7,8 @@
         <field name="arch" type="xml">
             <group name="general_settings" position="after">
                 <group name="Server Integration">
-                    <field name="is_wt_admin" widget="boolean_toggle"/>
-                    <field name="auto_export_work_log" widget="boolean_toggle"/>
-                    <field name="auto_remove_access" widget="boolean_toggle"/>
+                    <field name="is_wt_admin"/>
+                    <field name="auto_export_work_log"/>
                 </group>
             </group>
             <xpath expr="//header" position="inside">
@@ -25,9 +24,8 @@
         <field name="arch" type="xml">
             <group name="general_settings" position="after">
                 <group name="Server Integration">
-                    <field name="is_wt_admin" widget="boolean_toggle"/>
-                    <field name="auto_export_work_log" widget="boolean_toggle"/>
-                    <field name="auto_remove_access" widget="boolean_toggle"/>
+                    <field name="is_wt_admin"/>
+                    <field name="auto_export_work_log"/>
                 </group>
             </group>
             <xpath expr="//header" position="inside">

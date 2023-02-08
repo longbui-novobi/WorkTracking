@@ -13,6 +13,7 @@
                             <field name="default_unit"/>
                             <field name="todo_transition"/>
                             <field name="move_threshold" attrs="{'invisible': [['todo_transition','=',False]]}"/>
+                            <field name="auto_remove_access"/>
                             <field name="maximum_connection" attrs="{'invisible': [('auto_remove_access', '=', False)]}"/>
                         </group>
                     </group>
