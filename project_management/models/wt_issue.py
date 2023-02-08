@@ -413,7 +413,7 @@ class WtProject(models.Model):
         today_issue_by_user = {issue.assignee_id.id: issue for issue in today_issues}
         if yesterday_issues:
             checklists = self.env['wt.ac'].search([('issue_id','in', yesterday_issues.ids)])
-            checklists_by_issue = defaultdict(lambda self: self.env['wt.ac'])
+            checklists_by_issue = defaultdict(lambda self.env['wt.ac'])
             for checklist in checklists:
                 checklists_by_issue[checklist.issue_id] |= checklist
             for issue, checklists in checklists_by_issue.items():
