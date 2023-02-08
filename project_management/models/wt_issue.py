@@ -308,6 +308,8 @@ class WtProject(models.Model):
                 return self.get_daily_tasks(user_dt)
             else:
                 return [('id', '=', 0)]
+        if 'favorite' in res:
+            return [('id', 'in', self.user_id.employee_id.favorite_issue_ids.ids)]
         if 'issue' in res:
             domain = expression.AND([domain, [('issue_key', 'ilike', res['issue'])]])
         if 'project' in res:
