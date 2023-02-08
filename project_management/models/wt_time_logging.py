@@ -123,7 +123,7 @@ class WtTimeLog(models.Model):
                 hour=0, minute=0, second=0)
             start_time = user_start_time.astimezone(pytz.utc)
         else:
-            user_start_time = end_time.astimezone(tz) - relativedelta(days=1, hour=0, minute=0, second=0)
+            user_start_time = end_time.astimezone(tz) - relativedelta(days=self.env.user.default_nbr_days, hour=0, minute=0, second=0)
             start_time = user_start_time.astimezone(pytz.utc)
         return self.search([('state', '=', 'done'), ('start_date', '>', start_time), ('start_date', '<=', end_time),
                             ('user_id', '=', self.env.user.id)], order='start_date desc')
