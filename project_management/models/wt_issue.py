@@ -412,12 +412,11 @@ class WtProject(models.Model):
         today_issues = self.search([('personal', '=', True), ('applicable_date', '=', fields.Date.context_today(self))])
         today_issue_by_user = {issue.assignee_id.id: issue for issue in today_issues}
         if yesterday_issues:
-            checklists = self.env['wt.ac'].search([('issue_id','in', yesterday_issues.ids)])
-            checklists_by_issue = defaultdict(lambda: self.env['wt.ac'])
-            for checklist in checklists:
-                checklists_by_issue[checklist.issue_id] |= checklist
-            for issue, checklists in checklists_by_issue.items():
-                if checklists and issue:
-                    today_issue = today_issue_by_user.get(issue.assignee_id)
-                    if today_issue:
-                        checklists.issue_id = today_issue.id
+            checklists = self.env['wt.ac'].search([('issue_id','in', yesterday_issues.ids), ('checked', '=', False)])
+            issues = checklists.issue_id
+            for issue in issues:
+                if issue:
+                    today_issue = today_issue_by_user.get(issue.assignee_id.id)
+                    to_move_checklists = issues.ac_ids.filtered(lambda check: check.is_header and not check.checked)
+                    to_move_checklists.issue_id = today_issue.id
+                    to_move_checklists.sequence = 1000
