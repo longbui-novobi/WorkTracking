@@ -32,3 +32,8 @@ class HREmployee(models.AbstractModel):
         for record in self:
             if record.default_nbr_days > 14 or record.default_nbr_days <= 0:
                 raise UserError("Default Show Tracking must be less than 14 and greater than 0")
+
+    def action_reset_extension_token(self):
+        self.ensure_one()
+        if self.user_id:
+            self.env['user.access.code'].sudo().search([('uid', '=', self.env.user.id)]).unlink()

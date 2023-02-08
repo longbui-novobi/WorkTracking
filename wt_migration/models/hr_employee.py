@@ -7,11 +7,6 @@ class HREmployee(models.AbstractModel):
     is_wt_admin = fields.Boolean(string="Admin?", tracking=True)
     auto_export_work_log = fields.Boolean(string='Auto Export Logs', tracking=True)
 
-    def action_reset_extension_token(self):
-        self.ensure_one()
-        if self.user_id:
-            self.env['user.access.code'].sudo().search([('uid', '=', self.env.user.id)]).unlink()
-
     def action_update_token(self):
         action = self.env["ir.actions.actions"]._for_xml_id("wt_migration.token_confirmation_action_form")
         action['context'] = {'default_employee_id': self.id}

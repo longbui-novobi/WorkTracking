@@ -6,14 +6,13 @@
         <field name="inherit_id" ref="project_management.wt_hr_form_view_inherited"/>
         <field name="arch" type="xml">
             <group name="general_settings" position="after">
-                <group name="Server Integration">
+                <group string="Server Integration" name="server_integration">
                     <field name="is_wt_admin"/>
                     <field name="auto_export_work_log"/>
                 </group>
             </group>
             <xpath expr="//header" position="inside">
                 <button name="action_update_token" type="object" string="Update Jira Token" class="btn-primary"/>
-                <button name="action_reset_extension_token" type="object" string="Reset Extension Token" class="btn-secondary"/>
             </xpath>
         </field>
     </record>
@@ -30,7 +29,6 @@
             </group>
             <xpath expr="//header" position="inside">
                 <button name="action_update_token" type="object" string="Update Jira Token" class="btn-primary"/>
-                <button name="action_reset_extension_token" type="object" string="Reset Extension Token" class="btn-secondary"/>
             </xpath>
         </field>
     </record>
