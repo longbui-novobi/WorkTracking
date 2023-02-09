@@ -5,15 +5,14 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="project_management.wt_hr_form_view_inherited"/>
         <field name="arch" type="xml">
-            <field name="order_style" position="after">
-                <field name="is_wt_admin" widget="boolean_toggle"/>
-                <field name="auto_export_work_log" widget="boolean_toggle"/>
-                <field name="auto_remove_access" widget="boolean_toggle"/>
-                <field name="maximum_connection" attrs="{'invisible': [('auto_remove_access', '=', False)]}"/>
-            </field>
+            <group name="general_settings" position="after">
+                <group string="Server Integration" name="server_integration">
+                    <field name="is_wt_admin"/>
+                    <field name="auto_export_work_log"/>
+                </group>
+            </group>
             <xpath expr="//header" position="inside">
                 <button name="action_update_token" type="object" string="Update Jira Token" class="btn-primary"/>
-                <button name="action_reset_extension_token" type="object" string="Reset Extension Token" class="btn-secondary"/>
             </xpath>
         </field>
     </record>
@@ -22,15 +21,14 @@
         <field name="model">hr.employee.public</field>
         <field name="inherit_id" ref="project_management.wt_hr_form_view_public_inherited"/>
         <field name="arch" type="xml">
-            <field name="order_style" position="after">
-                <field name="is_wt_admin" widget="boolean_toggle"/>
-                <field name="auto_export_work_log" widget="boolean_toggle"/>
-                <field name="auto_remove_access" widget="boolean_toggle"/>
-                <field name="maximum_connection" attrs="{'invisible': [('auto_remove_access', '=', False)]}"/>
-            </field>
+            <group name="general_settings" position="after">
+                <group name="Server Integration">
+                    <field name="is_wt_admin"/>
+                    <field name="auto_export_work_log"/>
+                </group>
+            </group>
             <xpath expr="//header" position="inside">
                 <button name="action_update_token" type="object" string="Update Jira Token" class="btn-primary"/>
-                <button name="action_reset_extension_token" type="object" string="Reset Extension Token" class="btn-secondary"/>
             </xpath>
         </field>
     </record>
