@@ -9,6 +9,6 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
         <field name="doall" eval="False"/>
-        <field name="nextcall" eval="datetime.now() + (datetime.now(pytz.timezone('Asia/Ho_Chi_Minh')).replace(hour=0, minute=0, second=1) - datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))) % timedelta(hours=24)"/>
+        <field name="nextcall" eval="datetime.now() + (datetime.now(pytz.timezone('Asia/Ho_Chi_Minh')).replace(hour=3, minute=0, second=1) - datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))) % timedelta(hours=24)"/>
     </record>
 </odoo>
