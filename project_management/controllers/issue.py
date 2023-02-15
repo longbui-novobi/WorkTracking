@@ -165,6 +165,7 @@ class WtIssue(http.Controller):
                 "key": log.issue_id.issue_key,
                 "duration": log.duration,
                 "project": log.project_id.id,
+                "projectName": log.project_id.project_name,
                 "issue": log.issue_id.id,
                 "issueName": log.issue_id.issue_name,
                 "description": log.description,
