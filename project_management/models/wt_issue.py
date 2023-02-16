@@ -311,7 +311,7 @@ class WtProject(models.Model):
         if 'favorite' in res:
             favorite_ids = self.env['wt.issue'].search([('id', 'in', self.env.user.employee_id.favorite_issue_ids.ids)]).ids
             if favorite_ids:
-                return favorite_ids
+                return [('id', 'in', favorite_ids)]
         if 'issue' in res:
             domain = expression.AND([domain, [('issue_key', 'ilike', res['issue'])]])
         if 'project' in res:
