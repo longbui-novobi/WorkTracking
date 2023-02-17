@@ -18,7 +18,7 @@ class WtTimeLog(models.Model):
     _order = 'start_date desc'
     _rec_name = 'issue_id'
 
-    time = fields.Char(string='Time Logging', compute='_compute_time_data', store=True)
+    time = fields.Char(string='Time Logging', compute='_compute_duration_hrs', store=True)
     description = fields.Text(string='Description')
     issue_id = fields.Many2one('wt.issue', string='Issue', ondelete="cascade")
     duration = fields.Integer(string='Duration', required=True)
@@ -28,6 +28,7 @@ class WtTimeLog(models.Model):
     user_id = fields.Many2one('res.users', string='User')
     epic_id = fields.Many2one("wt.issue", string="Epic", related="issue_id.epic_id", store=True)
     start_date = fields.Datetime("Start Date")
+    end_date = fields.Datetime("End Date", compute="_compute_duration_hrs", store=True)
     encode_string = fields.Char(string="Hash String", compute='_compute_encode_string')
     project_id = fields.Many2one(string='Project', related="issue_id.project_id", store=True)
     duration_hrs = fields.Float(string="Duration(hrs)", compute="_compute_duration_hrs", store=True)
@@ -43,14 +44,11 @@ class WtTimeLog(models.Model):
     @api.depends("duration")
     def _compute_duration_hrs(self):
         for record in self:
-            record.duration_hrs = record.duration / 3600
-
-    @api.depends('duration')
-    def _compute_time_data(self):
-        for record in self:
             if record.duration:
                 record.time = convert_second_to_log_format(record.duration)
-
+                record.duration_hrs = record.duration / 3600
+                record.end_date = record.start_date + relativedelta(seconds=record.duration)
+                
     def unlink(self):
         cluster_ids = self.mapped('cluster_id')
         work_log_ids = self.mapped('issue_id').mapped('work_log_ids').filtered(lambda r: r.cluster_id in cluster_ids)
