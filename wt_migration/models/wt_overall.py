@@ -1,5 +1,6 @@
 import datetime
 from odoo import api, fields, models, _
+from odoo.osv import expression
 from odoo.exceptions import UserError
 import json
 import logging
@@ -66,3 +67,11 @@ class WtTimeLog(models.Model):
         except:
             pass
         return super().unlink()
+
+    def load_history_domain(self):
+        domain = super().load_history_domain()
+        if self._context.get('tracking') == "unexported":
+            domain = expression.AND([[('is_exported', '=',False)], domain])
+        if self._context.get('tracking') == "exported":
+            domain = expression.AND([[('is_exported', '=',True)], domain])
+        return domain

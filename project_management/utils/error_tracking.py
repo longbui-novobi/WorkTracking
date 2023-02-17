@@ -1,3 +1,4 @@
+import traceback
 import functools
 import logging
 from odoo.http import request, Response
@@ -11,6 +12,6 @@ def handling_req_res(func):
             request.env.user._update_last_login()
             return func(*args, **kwargs)
         except Exception as e:
-            _logger.warning(e)
+            _logger.error(traceback.format_exc())
             return Response(str(e), content_type='application/json', status=404)
     return wrapper_func

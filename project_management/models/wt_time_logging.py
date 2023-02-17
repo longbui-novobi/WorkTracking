@@ -107,9 +107,8 @@ class WtTimeLog(models.Model):
                 'key': record.encode_string,
                 'value': nonce
             })
-
     @api.model
-    def load_history(self):
+    def load_history_domain(self):
         tz = pytz.timezone(self.env.user.tz or 'UTC')
         unix = int(float(self._context.get('unix', 0)))
         from_unix = int(float(self._context.get('from_unix')))
@@ -123,5 +122,9 @@ class WtTimeLog(models.Model):
         else:
             user_start_time = end_time.astimezone(tz) - relativedelta(days=self.env.user.employee_id.default_nbr_days, hour=0, minute=0, second=0)
             start_time = user_start_time.astimezone(pytz.utc)
-        return self.search([('state', '=', 'done'), ('start_date', '>', start_time), ('start_date', '<=', end_time),
-                            ('user_id', '=', self.env.user.id)], order='start_date desc')
+        domain = [('state', '=', 'done'), ('start_date', '>', start_time), ('start_date', '<=', end_time), ('user_id', '=', self.env.user.id)]
+        return domain
+
+    @api.model
+    def load_history(self):
+        return self.search(self.load_history_domain(), order='start_date desc')
