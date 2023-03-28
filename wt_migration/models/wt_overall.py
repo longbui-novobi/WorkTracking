@@ -1,7 +1,6 @@
-import datetime
 from collections import defaultdict
-import json
 import logging
+import traceback
 
 from odoo import api, fields, models, _
 from odoo.osv import expression
@@ -47,6 +46,8 @@ class WtTimeLog(models.Model):
     
     def _get_export_state(self, values):
         self.ensure_one() 
+        _logger.info(values)
+        _logger.info(traceback.format_exc())
         if 'start_date' in values and 'description' in values and 'duration' in values:
             return 5
         if 'start_date' in values and 'duration' in values:
