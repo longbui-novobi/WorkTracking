@@ -29,6 +29,10 @@ class WtTimeLog(models.Model):
         (2, "Exported But Description Change"),
         (3, "Exported But Duration Change"),
         (4, "Exported But Start Date Change"),
+        (5, "Exported But All Changes"),
+        (6, "Exported But Duration + Start Date Changes"),
+        (7, "Exported But Duration + Description Changes"),
+        (8, "Exported But Description + Start Date Changes"),
     ], string="Export State")
 
     def batch_export(self, pivot_time):
@@ -43,12 +47,20 @@ class WtTimeLog(models.Model):
     
     def _get_export_state(self, values):
         self.ensure_one()
-        if 'description' in values:
-            return 2
+        if 'start_date' in values and 'description' in values and 'duration' in values:
+            return 5
+        if 'start_date' in values and 'duration' in values:
+            return 6
+        if 'start_date' in values and 'description' in values:
+            return 8
+        if 'description' in values and 'duration' in values:
+            return 7
+        if 'start_date':
+            return 4
         if 'duration' in values:
             return 3
-        if 'start_date' in values:
-            return 4
+        if 'description' in values:
+            return 2
 
     def write(self, values):
         user = self.env.user
@@ -87,7 +99,7 @@ class WtTimeLog(models.Model):
                 issues[record.issue_id] = record
         for issue in issues.keys():
             issue.wt_migration_id.export_specific_log(issue, issues[issue])
-        self.export_state = 2
+        self.export_state = 1
         return self
 
     def unlink(self):
@@ -101,7 +113,7 @@ class WtTimeLog(models.Model):
     def load_history_domain(self):
         domain = super().load_history_domain()
         if self._context.get('tracking') == "unexported":
-            domain = expression.AND([[('export_state', '=', 2)], domain])
+            domain = expression.AND([[('export_state', '=', 1)], domain])
         if self._context.get('tracking') == "exported":
-            domain = expression.AND([[('export_state', '!=', 2)], domain])
+            domain = expression.AND([[('export_state', '!=', 1)], domain])
         return domain
