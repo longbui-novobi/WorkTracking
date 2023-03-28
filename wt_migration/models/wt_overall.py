@@ -81,6 +81,7 @@ class WtTimeLog(models.Model):
                         except Exception as e:
                             _logger.error(e)
             exported_values = {**values, **{'export_state': 1}}
+            _logger.info('processed_records')
             super(WtTimeLog, processed_records.with_context(bypass_exporting_check=True)).write(exported_values)
             exported_logs = (self-processed_records).filtered(lambda r: r.export_state >= 1)
             if exported_logs:
@@ -90,9 +91,12 @@ class WtTimeLog(models.Model):
                     log_by_state[state] |= log
                 for state, logs in log_by_state.items():
                     exported_values['export_state'] = state
+                    _logger.info('exported_values')
                     super(WtTimeLog, logs.with_context(bypass_exporting_check=True)).write(exported_values)
             to_update_records -= (processed_records | exported_logs)
-        res = super(WtTimeLog, to_update_records).write(values)
+        if to_update_records:
+            _logger.info('to_update_records')
+            res = super(WtTimeLog, to_update_records).write(values)
         return res
 
     def force_export(self):
