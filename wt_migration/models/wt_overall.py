@@ -66,7 +66,7 @@ class WtTimeLog(models.Model):
     def write(self, values):
         res = True
         if not self._context.get("bypass_cross_user"):
-            user = self.env.user
+            user = self.env.user 
             other_logs = self.filtered(lambda log: log.user_id != user)
             if other_logs or self._context.get():
                 raise UserError("You cannot update work log of other user")
