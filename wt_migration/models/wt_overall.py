@@ -68,7 +68,7 @@ class WtTimeLog(models.Model):
         other_logs = self.filtered(lambda log: log.user_id != user)
         if other_logs:
             raise UserError("You cannot update work log of other user")
-        res = super().write(values)
+        to_update_records = self
         if 'export_state' not in values and not self._context.get("bypass_exporting_check"):
             processed_records = self.env['wt.time.log']
             employee = self.env.user.employee_id
@@ -80,7 +80,8 @@ class WtTimeLog(models.Model):
                             processed_records |= log
                         except Exception as e:
                             _logger.error(e)
-            processed_records.with_context(bypass_exporting_check=True).write({'export_state': 1})
+            exported_values = {**values, **{'export_state': 1}}
+            super(WtTimeLog, processed_records.with_context(bypass_exporting_check=True)).write(exported_values)
             exported_logs = (self-processed_records).filtered(lambda r: r.export_state >= 1)
             if exported_logs:
                 log_by_state = defaultdict(lambda: self.env['wt.time.log'])
@@ -88,7 +89,10 @@ class WtTimeLog(models.Model):
                     state = log._get_export_state(values)
                     log_by_state[state] |= log
                 for state, logs in log_by_state.items():
-                    logs.update({'export_state': state})
+                    exported_values['export_state'] = state
+                    super(WtTimeLog, logs.with_context(bypass_exporting_check=True)).write(exported_values)
+            to_update_records -= (processed_records | exported_logs)
+        res = super(WtTimeLog, to_update_records).write(values)
         return res
 
     def force_export(self):
