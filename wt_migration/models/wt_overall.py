@@ -63,29 +63,31 @@ class WtTimeLog(models.Model):
             return 2
 
     def write(self, values):
+        user = self.env.user
+        other_logs = self.filtered(lambda log: log.user_id != user)
+        if other_logs:
+            raise UserError("You cannot update work log of other user")
         res = super().write(values)
-        if not self._context.get("bypass_exporting_check"):
-            log_by_employee = defaultdict(lambda: self.env['wt.time.log'])
+        if 'export_state' not in values and not self._context.get("bypass_exporting_check"):
             processed_records = self.env['wt.time.log']
-            for log in self:
-                log_by_employee[log.employee_id] |= log
-            for employee, logs in log_by_employee.items():
-                if employee.auto_export_work_log:
-                    for log in logs:
-                        if log.issue_id.wt_migration_id.auto_export_work_log:
-                            try:
-                                log.issue_id.wt_migration_id.export_specific_log(log.issue_id, log)
-                                log.export_state = 1
-                                processed_records |= log
-                            except Exception as e:
-                                _logger.error(e)
-            exported_logs = (self-processed_records).filtered(lambda r: r.export_state >= 1)
-            log_by_state = defaultdict(lambda: self.env['wt.time.log'])
-            for log in exported_logs:
-                state = log._get_export_state(values)
-                log_by_state[state] |= log
-            for state, logs in log_by_state.items():
-                log.update({'export_state': state})
+            employee = self.env.user.employee_id
+            if employee.auto_export_work_log:
+                for log in self:
+                    if log.issue_id.wt_migration_id.auto_export_work_log:
+                        try:
+                            log.issue_id.wt_migration_id.export_specific_log(log.issue_id, log)
+                            processed_records |= log
+                        except Exception as e:
+                            _logger.error(e)
+            processed_records.with_context(bypass_exporting_check=True).write({'export_state': 2})
+            exported_logs = (self-processed_records).filtered(lambda r: r.export_state == 2)
+            if exported_logs:
+                log_by_state = defaultdict(lambda: self.env['wt.time.log'])
+                for log in exported_logs:
+                    state = log._get_export_state(values)
+                    log_by_state[state] |= log
+                for state, logs in log_by_state.items():
+                    logs.update({'export_state': state})
         return res
 
     def force_export(self):
