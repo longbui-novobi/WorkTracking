@@ -11,7 +11,7 @@ class WtIssueMigration(WtIssue):
 
     def _get_work_log(self, log): 
         res = super()._get_work_log(log)
-        res['exported'] = log.is_exported
+        res['exported'] = log.export_state
         return res
 
     @handling_req_res
