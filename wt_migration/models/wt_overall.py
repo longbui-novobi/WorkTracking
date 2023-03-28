@@ -55,7 +55,7 @@ class WtTimeLog(models.Model):
             return 8
         if 'description' in values and 'duration' in values:
             return 7
-        if 'start_date':
+        if 'start_date' in values:
             return 4
         if 'duration' in values:
             return 3
