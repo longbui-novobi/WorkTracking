@@ -22,17 +22,18 @@ class WtTimeLog(models.Model):
     is_exported = fields.Boolean(string="Is Exported?", default=False)
     wt_create_date = fields.Datetime(string="Wt Create On")
     wt_write_date = fields.Datetime(string="Wt Update On")
-    export_state = fields.Selection([
-        (0, "Unexported"),
-        (1, "Exported"),
-        (2, "Exported But Description Change"),
-        (3, "Exported But Duration Change"),
-        (4, "Exported But Start Date Change"),
-        (5, "Exported But All Changes"),
-        (6, "Exported But Duration + Start Date Changes"),
-        (7, "Exported But Duration + Description Changes"),
-        (8, "Exported But Description + Start Date Changes"),
-    ], string="Export State")
+    export_state = fields.Integer( string="Export State", default=False)
+    # [
+    #     (0, "Unexported"),
+    #     (1, "Exported"),
+    #     (2, "Exported But Description Change"),
+    #     (3, "Exported But Duration Change"),
+    #     (4, "Exported But Start Date Change"),
+    #     (5, "Exported But All Changes"),
+    #     (6, "Exported But Duration + Start Date Changes"),
+    #     (7, "Exported But Duration + Description Changes"),
+    #     (8, "Exported But Description + Start Date Changes"),
+    # ],
 
     def batch_export(self, pivot_time):
         issue_ids = self.mapped('issue_id')

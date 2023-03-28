@@ -542,7 +542,7 @@ class TaskMigration(models.Model):
             'state': 'done',
             'source': 'sync',
             'issue_id': issue.get(log.remote_issue_id, False),
-            'is_exported': True,
+            'export_state': 1,
             'wt_create_date': self.convert_server_tz_to_utc(log.create_date),
             'wt_write_date': self.convert_server_tz_to_utc(log.write_date),
         }
@@ -557,7 +557,7 @@ class TaskMigration(models.Model):
             existing_log = local['dict_log'].get(log.remote_id)
             curd_data = self.minify_with_existing_record(curd_data, existing_log)
             if len(curd_data.keys()):
-                curd_data['is_exported'] = True
+                curd_data['export_state'] = 1
                 existing_log.write(curd_data)
                 response['updated'] |= existing_log
 
@@ -804,7 +804,7 @@ class TaskMigration(models.Model):
             request_data['body'] = payload
             res = self.make_request(request_data, headers)
             log.id_on_wt = res['id']
-        time_log_ids.is_exported = True
+        time_log_ids.export_state = 1
 
     def update_time_logs(self, issue_id, time_log_ids):
         headers = self.__get_request_headers()
@@ -821,7 +821,7 @@ class TaskMigration(models.Model):
                 res = self.make_request(request_clone, headers)
             except:
                 continue
-        time_log_ids.is_exported = True
+        time_log_ids.export_state = 1
 
     def delete_time_logs(self, issue_id, time_log_ids):
         headers = self.__get_request_headers()
