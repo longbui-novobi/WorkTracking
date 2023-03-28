@@ -64,6 +64,7 @@ class WtTimeLog(models.Model):
             return 2
 
     def write(self, values):
+        res = True
         user = self.env.user
         other_logs = self.filtered(lambda log: log.user_id != user)
         if other_logs:
