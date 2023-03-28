@@ -15,6 +15,7 @@ class WtProject(models.Model):
  
     @api.model
     def cron_fetch_issue(self, load_create=True):
+        self = self.with_context(bypass_cross_user=True)
         if not self:
             self = self.search([('allow_to_fetch', '=', True), ('wt_migration_id.active', '=', True)])
         latest_unix = int(self.env['ir.config_parameter'].get_param('latest_unix'))
