@@ -64,11 +64,11 @@ class WtTimeLog(models.Model):
             return 2
 
     def write(self, values):
-        res = True
+        res = True 
         if not self._context.get("bypass_cross_user"):
             user = self.env.user 
             other_logs = self.filtered(lambda log: log.user_id != user)
-            if other_logs or self._context.get():
+            if other_logs:
                 raise UserError("You cannot update work log of other user")
         to_update_records = self
         if 'export_state' not in values and not self._context.get("bypass_exporting_check"):
