@@ -47,7 +47,6 @@ class WtTimeLog(models.Model):
     def _get_export_state(self, values):
         self.ensure_one() 
         _logger.info(values)
-        _logger.info(traceback.format_exc())
         if 'start_date' in values and 'description' in values and 'duration' in values:
             return 5
         if 'start_date' in values and 'duration' in values:
@@ -82,8 +81,9 @@ class WtTimeLog(models.Model):
                         except Exception as e:
                             _logger.error(e)
             exported_values = {**values, **{'export_state': 1}}
-            _logger.info('processed_records')
-            super(WtTimeLog, processed_records.with_context(bypass_exporting_check=True)).write(exported_values)
+            if processed_records:
+                _logger.info('processed_records')
+                super(WtTimeLog, processed_records.with_context(bypass_exporting_check=True)).write(exported_values)
             exported_logs = (self-processed_records).filtered(lambda r: r.export_state >= 1)
             if exported_logs:
                 log_by_state = defaultdict(lambda: self.env['wt.time.log'])
