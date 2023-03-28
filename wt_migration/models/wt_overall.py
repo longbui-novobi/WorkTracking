@@ -79,8 +79,8 @@ class WtTimeLog(models.Model):
                             processed_records |= log
                         except Exception as e:
                             _logger.error(e)
-            processed_records.with_context(bypass_exporting_check=True).write({'export_state': 2})
-            exported_logs = (self-processed_records).filtered(lambda r: r.export_state == 2)
+            processed_records.with_context(bypass_exporting_check=True).write({'export_state': 1})
+            exported_logs = (self-processed_records).filtered(lambda r: r.export_state >= 1)
             if exported_logs:
                 log_by_state = defaultdict(lambda: self.env['wt.time.log'])
                 for log in exported_logs:
