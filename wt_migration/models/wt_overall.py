@@ -65,10 +65,11 @@ class WtTimeLog(models.Model):
 
     def write(self, values):
         res = True
-        user = self.env.user
-        other_logs = self.filtered(lambda log: log.user_id != user)
-        if other_logs:
-            raise UserError("You cannot update work log of other user")
+        if not self._context.get("bypass_cross_user"):
+            user = self.env.user
+            other_logs = self.filtered(lambda log: log.user_id != user)
+            if other_logs or self._context.get():
+                raise UserError("You cannot update work log of other user")
         to_update_records = self
         if 'export_state' not in values and not self._context.get("bypass_exporting_check"):
             processed_records = self.env['wt.time.log']
@@ -93,7 +94,7 @@ class WtTimeLog(models.Model):
                     log_by_state[state] |= log
                 for state, logs in log_by_state.items():
                     exported_values['export_state'] = state
-                    _logger.info('exported_values')
+                    _logger.info('exported_values %s' % exported_values)
                     super(WtTimeLog, logs.with_context(bypass_exporting_check=True)).write(exported_values)
             to_update_records -= (processed_records | exported_logs)
         if to_update_records:
