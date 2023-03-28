@@ -79,9 +79,13 @@ class WtTimeLog(models.Model):
                 values['duration'] = self.rouding_log(values['duration'], employee_id)
 
     def write(self, values):
+        _logger.info('1')
+        _logger.info(values)
         self.rounding(values)
+        _logger.info('2')
         if type(values.get('start_date', None)) in (int, float):
             values['start_date'] = datetime.fromtimestamp(values['start_date'])
+        _logger.info(values)
         return super().write(values)
 
     @api.model
