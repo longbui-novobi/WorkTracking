@@ -46,7 +46,7 @@ class WtTimeLog(models.Model):
         return action
     
     def _get_export_state(self, values):
-        self.ensure_one()
+        self.ensure_one() 
         if 'start_date' in values and 'description' in values and 'duration' in values:
             return 5
         if 'start_date' in values and 'duration' in values:
