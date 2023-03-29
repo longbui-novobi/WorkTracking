@@ -388,7 +388,7 @@ class WtProject(models.Model):
     # ========================= AUTOMATE ACTION ==============
     def get_daily_tasks(self, date):
             _logger.info(date)
-            user_datetime = date.astimezone(pytz.timezone(self.env.user.tz or "UTC"))
+            user_datetime = datetime.datetime.combine(date.today(), datetime.datetime.min.time()).astimezone(pytz.timezone(self.env.user.tz or "UTC"))
             user_date = user_datetime.date()
             _logger.info(user_datetime)
             _logger.info(user_date)
