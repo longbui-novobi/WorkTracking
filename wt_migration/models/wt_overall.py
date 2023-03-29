@@ -150,7 +150,7 @@ class WtTimeLog(models.Model):
                         current = current.isoformat()
                         exported = exported.isoformat()
                     if current != exported:
-                        pass
+                        continue
                     res[log.id][key] = (current, exported)
             
             # logs_by_migration = defaultdict(lambda: self.env['wt.time.log'])
