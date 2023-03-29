@@ -94,7 +94,7 @@ class WtTimeLog(models.Model):
                 capture_export_start_date = '1970-01-01',
                 export_state = 0
                 WHERE id in %(ids)s
-            """, {'ids': tuple(self.ids)})
+            """, {'ids': tuple(to_delete_logs.ids)})
         res = True 
         self.rounding(values)
         if type(values.get('start_date', None)) in (int, float):
