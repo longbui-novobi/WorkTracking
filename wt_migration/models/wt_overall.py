@@ -149,7 +149,7 @@ class WtTimeLog(models.Model):
                     if isinstance(current, datetime):
                         current = current.isoformat()
                         exported = exported.isoformat()
-                    if current != exported:
+                    if current == exported:
                         continue
                     res[log.id][key] = (current, exported)
             
