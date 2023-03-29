@@ -664,6 +664,7 @@ class TaskMigration(models.Model):
                     self.env["wt.time.log"].with_context(bypass_rounding=True).create(to_create)
 
     def load_work_logs_by_unix(self, unix, users, batch=900, end_unix=-1):
+        self = self.with_context(bypass_cross_user=True)
         if self.import_work_log:
             for user in users:
                 last_page = False
@@ -725,6 +726,7 @@ class TaskMigration(models.Model):
                     self.env["wt.time.log"].create(to_create)
 
     def delete_work_logs_by_unix(self, unix, users, batch=900):
+        self = self.with_context(bypass_cross_user=True)
         if self.import_work_log:
             for user in users:
                 last_page = False
@@ -754,6 +756,7 @@ class TaskMigration(models.Model):
                         continue
 
     def load_work_logs(self, issue_ids, paging=100, domain=[], load_all=False):
+        self = self.with_context(bypass_cross_user=True)
         if self.import_work_log:
             mapping = ImportingJiraWorkLog(self.server_type, self.wt_server_url)
             headers = self.__get_request_headers()
@@ -855,6 +858,7 @@ class TaskMigration(models.Model):
         self.update_time_logs(issue_id, time_log_to_update_ids)
 
     def _update_project(self, project_id, project_last_update):
+        self = self.with_context(bypass_cross_user=True)
         updated_date = datetime(1970, 1, 1, 1, 1, 1, 1)
         if project_last_update:
             updated_date = self.convert_utc_to_usertz(project_last_update)
@@ -870,6 +874,7 @@ class TaskMigration(models.Model):
         _self.with_delay()._update_project(project_id, project_id.last_update)
 
     def update_projects(self, latest_unix, users):
+        self = self.with_context(bypass_cross_user=True)
         for user in users:
             self = self.with_user(user)
             str_updated_date = self.convert_utc_to_usertz(datetime.fromtimestamp(latest_unix / 1000)).strftime(
@@ -887,6 +892,7 @@ class TaskMigration(models.Model):
             self.with_delay().update_board(project_id)
 
     def update_board(self, project_id):
+        self = self.with_context(bypass_cross_user=True)
         self.load_sprints(project_id.board_ids)
         self.with_context(force=True).update_issue_for_sprints(project_id.sprint_ids)
 
