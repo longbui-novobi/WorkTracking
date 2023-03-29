@@ -55,6 +55,8 @@ class WtTimeLog(models.Model):
     def _get_export_state(self, values):
         self.ensure_one()
         value = 0
+        if 'issue_id' in values:
+            return 0
         if 'start_date' in values:
             if self.capture_export_start_date != values['start_date']:
                 value += 7
@@ -84,6 +86,15 @@ class WtTimeLog(models.Model):
             to_delete_logs = self.filtered(lambda r: r.issue_id.id != values['issue_id'])
             _logger.info(to_delete_logs)
             to_delete_logs.delete_work_logs_on_server()
+            self.env.cr.execute("""
+                UPDATE wt_time_log 
+                SET 
+                capture_export_description = False, 
+                capture_export_duration = False, 
+                capture_export_start_date = '1970-01-01',
+                export_state = 0
+                WHERE id in %(ids)s
+            """, {'ids': tuple(self.ids)})
         res = True 
         self.rounding(values)
         if type(values.get('start_date', None)) in (int, float):
