@@ -92,7 +92,8 @@ class WtTimeLog(models.Model):
                 capture_export_description = False, 
                 capture_export_duration = False, 
                 capture_export_start_date = '1970-01-01',
-                export_state = 0
+                export_state = 0,
+                id_on_wt = 0
                 WHERE id in %(ids)s
             """, {'ids': tuple(to_delete_logs.ids)})
         res = True 
