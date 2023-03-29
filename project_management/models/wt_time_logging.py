@@ -91,6 +91,8 @@ class WtTimeLog(models.Model):
 
     @api.model
     def create(self, values):
+        _logger.info(values)
+        _logger.info(self)
         self.rounding(values)
         if 'start_date' not in values:
             values['start_date'] = datetime.now()
