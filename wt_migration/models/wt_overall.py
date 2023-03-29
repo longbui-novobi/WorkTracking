@@ -144,8 +144,8 @@ class WtTimeLog(models.Model):
             res = defaultdict(dict)
             for log in self:
                 for key in keys:
-                    current = getattr(self, key)
-                    exported = getattr(self, 'capture_export_%s'%key)
+                    current = getattr(log, key)
+                    exported = getattr(log, 'capture_export_%s'%key)
                     if isinstance(current, datetime):
                         current = current.isoformat()
                         exported = exported.isoformat()
