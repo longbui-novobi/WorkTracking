@@ -1,11 +1,8 @@
 from datetime import datetime
 import pytz
-import logging
 from dateutil.relativedelta import relativedelta
 
-from odoo.tools.float_utils import float_is_zero
 
-_logger = logging.getLogger(__name__)
 
 def convert_second_to_time_format(time):
     data = [{'key': 'hours', 'duration': 3600},
@@ -40,6 +37,7 @@ def convert_log_format_to_second(log_data, employee_id):
     total_time = 0
     data = {'w': 604800, 'd': 86400, 'h': 3600, 'm': 60, 's': 1, '-1': 0}
     for log in logs:
+        operand = 0
         if len(log):
             try: 
                 operand = float(log)
