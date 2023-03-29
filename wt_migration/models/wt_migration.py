@@ -535,9 +535,12 @@ class TaskMigration(models.Model):
         curd_data = {
             'time': log.time,
             'duration': log.duration,
+            'description': log.capture_export_description or '',
+            'duration': log.capture_export_duration,
             'description': log.description or '',
             'id_on_wt': log.remote_id,
             'start_date': self.convert_server_tz_to_utc(log.start_date),
+            'capture_export_start_date': self.convert_server_tz_to_utc(log.start_date),
             'user_id': user_id,
             'state': 'done',
             'source': 'sync',
