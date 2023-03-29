@@ -108,19 +108,23 @@ class WtTimeLog(models.Model):
 
     def force_export(self):
         issues = dict()
+        _logger.info("=============")
         for record in self:
             if record.issue_id in issues:
                 issues[record.issue_id] |= record
             else:
                 issues[record.issue_id] = record
+            _logger.info("=============")
             record.update({
                 'capture_export_description': record.description,
                 'capture_export_duration': record.duration,
                 'capture_export_start_date': record.start_date
             })
+            _logger.info("=============")
         for issue in issues.keys():
             issue.wt_migration_id.export_specific_log(issue, issues[issue])
         self.export_state = 1
+        _logger.info("=============")
         return self
 
     def unlink(self):
