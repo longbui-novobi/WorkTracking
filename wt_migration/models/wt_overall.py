@@ -149,6 +149,8 @@ class WtTimeLog(models.Model):
                     if isinstance(current, datetime):
                         current = current.isoformat()
                         exported = exported.isoformat()
+                    if current != exported:
+                        pass
                     res[log.id][key] = (current, exported)
             
             # logs_by_migration = defaultdict(lambda: self.env['wt.time.log'])
