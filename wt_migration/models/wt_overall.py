@@ -26,13 +26,13 @@ class WtTimeLog(models.Model):
     # [
     #     (0, "Unexported"),
     #     (1, "Exported"),
-    #     (2, "Exported But Description Change"),
-    #     (3, "Exported But Duration Change"),
-    #     (4, "Exported But Start Date Change"),
-    #     (5, "Exported But All Changes"),
-    #     (6, "Exported But Duration + Start Date Changes"),
-    #     (7, "Exported But Duration + Description Changes"),
-    #     (8, "Exported But Description + Start Date Changes"),
+    #     (3, "Exported But Description Change"),
+    #     (5, "Exported But Duration Change"),
+    #     (7, "Exported But Start Date Change"),
+    #     (15, "Exported But All Changes"),
+    #     (12, "Exported But Duration + Start Date Changes"),
+    #     (8, "Exported But Duration + Description Changes"),
+    #     (10, "Exported But Description + Start Date Changes"),
     # ],
 
     def batch_export(self, pivot_time):
@@ -48,20 +48,14 @@ class WtTimeLog(models.Model):
     def _get_export_state(self, values):
         self.ensure_one() 
         _logger.info(values)
-        if 'start_date' in values and 'description' in values and 'duration' in values:
-            return 5
-        if 'start_date' in values and 'duration' in values:
-            return 6
-        if 'start_date' in values and 'description' in values:
-            return 8
-        if 'description' in values and 'duration' in values:
-            return 7
+        value = 0
         if 'start_date' in values:
-            return 4
+            value += 7
         if 'duration' in values:
-            return 3
+            value += 5
         if 'description' in values:
-            return 2
+            value += 3
+        return value
 
     def write(self, values):
         res = True 
