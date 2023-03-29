@@ -189,7 +189,7 @@ class TaskMigration(models.Model):
                 elif isinstance(value, str):
                     if value.strip() == (curd_data[keys[index]] or '').strip():
                         del curd_data[keys[index]]
-                elif float(value) == float('0' + curd_data[keys[index]]):
+                elif float(value) == float("0%s"%curd_data[keys[index]]):
                     del curd_data[keys[index]]
             else:
                 del curd_data[keys[index]]
