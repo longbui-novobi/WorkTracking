@@ -32,7 +32,7 @@ class WtTimeLog(models.Model):
     epic_id = fields.Many2one("wt.issue", string="Epic", related="issue_id.epic_id", store=True)
     start_date = fields.Datetime("Start Date")
     end_date = fields.Datetime("End Date", compute="_compute_duration_hrs", store=True)
-    encode_string = fields.Char(string="Hash String", compute='_compute_encode_string')
+    encode_string = fields.Char(string="Hash String")
     project_id = fields.Many2one(string='Project', related="issue_id.project_id", store=True)
     duration_hrs = fields.Float(string="Duration(hrs)", compute="_compute_duration_hrs", store=True)
     filter_date = fields.Char(string="Filter", store=False, search='_search_filter_date')
