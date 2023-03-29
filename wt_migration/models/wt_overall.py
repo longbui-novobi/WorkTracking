@@ -62,11 +62,20 @@ class WtTimeLog(models.Model):
         _logger.info(self.start_date)
         _logger.info(self.capture_export_description)
         _logger.info(self.description)
-        if ('start_date' in values and self.capture_export_start_date != values['start_date']) or self.capture_export_start_date != self.start_date:
+        if 'start_date' in values:
+            if self.capture_export_start_date != values['start_date']:
+                value += 7
+        elif self.capture_export_start_date != self.start_date:
             value += 7
-        if ('duration' in values and self.capture_export_duration != values['duration']) or self.capture_export_duration != self.duration:
-            value += 5
-        if ('description' in values and self.capture_export_description != values['description']) or self.capture_export_description != self.description:
+        if 'duration' in values:
+            if self.capture_export_duration != values['duration']:
+                value += 5
+        elif self.capture_export_duration != self.duration:
+            value +=7
+        if 'description' in values:
+            if self.capture_export_description != values['description']:
+                value += 3
+        elif self.capture_export_description != self.description:
             value += 3
         return value or 1
 
