@@ -72,13 +72,23 @@ class WtTimeLog(models.Model):
             value += 3
         return value or 1
 
+    def delete_work_logs_on_server(self, ):
+        log_by_issue = defaultdict(lambda: self.env['wt.issue'])
+        for log in self:
+            log_by_issue[log.issue_id] |= log
+        for issue, logs in log_by_issue.items():
+            issue.wt_migration_id.delete_time_logs(issue, logs)
+
     def write(self, values):
+        if 'issue_id' in values:
+            to_delete_logs = self.filtered(lambda r: r.issue_id.id != values['issue_id'])
+            _logger.info(to_delete_logs)
+            to_delete_logs.delete_work_logs_on_server()
         res = True 
         self.rounding(values)
         if type(values.get('start_date', None)) in (int, float):
             values['start_date'] = datetime.fromtimestamp(values['start_date'])
         # END  PROJECT MANAGEMENT
-
         if type(values.get('description', None)) == str:
             values['description'] = values['description'].strip()
         if not self._context.get("bypass_cross_user"):
@@ -113,6 +123,7 @@ class WtTimeLog(models.Model):
             to_update_records -= (processed_records | exported_logs)
         if to_update_records:
             res = super(WtTimeLog, to_update_records).write(values)
+
         return res
 
     def force_export(self):
