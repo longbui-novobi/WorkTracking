@@ -8,7 +8,7 @@ from odoo import api, fields, models, _
 from odoo.osv import expression
 from odoo.exceptions import UserError
 
-from odoo.addons.project_management.models.wt_time_logging import WtTimeLogBase
+from odoo.addons.project_management.models.wt_time_logging import WtTimeLog as WtTimeLog
 
 _logger = logging.getLogger(__name__)
 
