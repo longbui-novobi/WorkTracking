@@ -139,6 +139,6 @@ class WtTimeLog(models.Model):
         return domain
 
 def write(self, values):
-    return super().write(values)
+    return super(WtTimeLogBase, self).write(values)
 
 WtTimeLogBase.write = write
