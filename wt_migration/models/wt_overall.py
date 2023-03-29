@@ -89,8 +89,8 @@ class WtTimeLog(models.Model):
             self.env.cr.execute("""
                 UPDATE wt_time_log 
                 SET 
-                capture_export_description = False, 
-                capture_export_duration = False, 
+                capture_export_description = 0, 
+                capture_export_duration = 0, 
                 capture_export_start_date = '1970-01-01',
                 export_state = 0,
                 id_on_wt = 0
