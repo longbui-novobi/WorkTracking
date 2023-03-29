@@ -139,7 +139,7 @@ class WtTimeLog(models.Model):
             domain = expression.AND([[('export_state', '!=', 1)], domain])
         return domain
     
-    def compare_with_external(self, keys={'start_date', 'duration', 'description'}):
+    def compare_with_external(self, keys={'start_date', 'time', 'description'}):
         if self:
             res = defaultdict(dict)
             for log in self:
