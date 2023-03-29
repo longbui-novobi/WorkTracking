@@ -144,7 +144,7 @@ class WtTimeLog(models.Model):
             res = defaultdict(dict)
             for log in self:
                 for key in keys:
-                    res[log.id][key] = (self.key, getattr(self, 'capture_export_%s'%key))
+                    res[log.id][key] = (getattr(self, key), getattr(self, 'capture_export_%s'%key))
             
             # logs_by_migration = defaultdict(lambda: self.env['wt.time.log'])
             # for log in self:
