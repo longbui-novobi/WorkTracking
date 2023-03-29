@@ -27,6 +27,9 @@ class WtTimeLog(models.Model):
     wt_create_date = fields.Datetime(string="Wt Create On")
     wt_write_date = fields.Datetime(string="Wt Update On")
     export_state = fields.Integer( string="Export State", default=False)
+    capture_export_description = fields.Char(string="Capture Export Description")
+    capture_export_duration = fields.Integer(string="Capture Export Duration")
+    capture_export_start_date = fields.Datetime(string="Capture Export Datetime")
     # [
     #     (0, "Unexported"),
     #     (1, "Exported"),
@@ -52,11 +55,11 @@ class WtTimeLog(models.Model):
     def _get_export_state(self, values):
         self.ensure_one()
         value = 0
-        if 'start_date' in values and self.start_date != values['start_date']:
+        if 'start_date' in values and self.capture_export_start_date != values['start_date']:
             value += 7
-        if 'duration' in values and self.duration != values['duration']:
+        if 'duration' in values and self.capture_export_duration != values['duration']:
             value += 5
-        if 'description' in values and self.description != values['description']:
+        if 'description' in values and self.capture_export_description != values['description']:
             value += 3
         return value or 1
 
@@ -110,6 +113,11 @@ class WtTimeLog(models.Model):
                 issues[record.issue_id] |= record
             else:
                 issues[record.issue_id] = record
+            record.update({
+                'capture_export_description': record.description,
+                'capture_export_duration': record.duration,
+                'capture_export_start_date': record.start_date
+            })
         for issue in issues.keys():
             issue.wt_migration_id.export_specific_log(issue, issues[issue])
         self.export_state = 1
