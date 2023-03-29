@@ -538,7 +538,7 @@ class TaskMigration(models.Model):
             'start_date': self.convert_server_tz_to_utc(log.start_date),
             'description': log.description or '',
             'id_on_wt': log.remote_id,
-            'capture_export_duration': log.capture_export_duration,
+            'capture_export_duration': log.duration,
             'capture_export_start_date': self.convert_server_tz_to_utc(log.start_date),
             'capture_export_description': log.description or '',
             'user_id': user_id,
