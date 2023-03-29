@@ -40,7 +40,8 @@ def convert_log_format_to_second(log_data, employee_id):
     total_time = 0
     data = {'w': 604800, 'd': 86400, 'h': 3600, 'm': 60, 's': 1, '-1': 0}
     for log in logs:
-        if log:
+        _logger(log)
+        if len(log):
             try: 
                 operand = float(log)
                 unit = employee_id.default_unit
@@ -49,6 +50,7 @@ def convert_log_format_to_second(log_data, employee_id):
                 unit = log[-1]
         else:
             unit = '-1'
+        _logger(unit)
         if not data.get(unit):
             raise AttributeError("Your format is incorrect")
         total_time += operand * data.get(unit, 0)
