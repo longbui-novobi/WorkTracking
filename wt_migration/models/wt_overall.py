@@ -73,7 +73,7 @@ class WtTimeLog(models.Model):
         return value or 1
 
     def delete_work_logs_on_server(self, ):
-        log_by_issue = defaultdict(lambda: self.env['wt.issue'])
+        log_by_issue = defaultdict(lambda: self.env['wt.time.log'])
         for log in self:
             log_by_issue[log.issue_id] |= log
         for issue, logs in log_by_issue.items():
