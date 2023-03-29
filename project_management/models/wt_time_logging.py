@@ -1,14 +1,17 @@
-from datetime import datetime
 import pytz
-from dateutil.relativedelta import relativedelta
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError
-from odoo.addons.project_management.utils.time_parsing import convert_second_to_log_format, \
-    convert_log_format_to_second, get_date_range
 from Crypto.Cipher import AES
 import base64
 import json
 import logging
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
+
+from odoo.addons.project_management.utils.time_parsing import convert_second_to_log_format, \
+    convert_log_format_to_second, get_date_range
+
 _logger = logging.getLogger(__name__)
 
 
@@ -71,12 +74,12 @@ class WtTimeLog(models.Model):
     def rounding(self, values):
         if not self._context.get('bypass_rounding', False):
             if 'time' in values:
-                employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1)
-                values['duration'] = self.rouding_log(convert_log_format_to_second(values['time'], employee_id), employee_id)
+                employee = self.env.user.employee_id
+                values['duration'] = self.rouding_log(convert_log_format_to_second(values['time'], employee), employee)
                 values.pop('time')
             elif 'duration' in values:
-                employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1)
-                values['duration'] = self.rouding_log(values['duration'], employee_id)
+                employee = self.env.user.employee_id
+                values['duration'] = self.rouding_log(values['duration'], employee)
 
     def write(self, values):
         self.rounding(values)

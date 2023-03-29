@@ -1,10 +1,14 @@
 from collections import defaultdict
 import logging
 import traceback
+from datetime import datetime
+
 
 from odoo import api, fields, models, _
 from odoo.osv import expression
 from odoo.exceptions import UserError
+
+from odoo.addons.project_management.models.wt_time_logging import WtTimeLogBase
 
 _logger = logging.getLogger(__name__)
 
@@ -49,16 +53,19 @@ class WtTimeLog(models.Model):
         self.ensure_one() 
         _logger.info(values)
         value = 0
-        if 'start_date' in values:
+        if 'start_date' in values and self.start_date != value['start_date']:
             value += 7
-        if 'duration' in values:
+        if 'duration' in values and self.duration != value['duration']:
             value += 5
-        if 'description' in values:
+        if 'description' in values and self.description != value['description']:
             value += 3
         return value
 
     def write(self, values):
         res = True 
+        self.rounding(values)
+        if type(values.get('start_date', None)) in (int, float):
+            values['start_date'] = datetime.fromtimestamp(values['start_date'])
         if not self._context.get("bypass_cross_user"):
             user = self.env.user 
             other_logs = self.filtered(lambda log: log.user_id != user)
@@ -123,3 +130,8 @@ class WtTimeLog(models.Model):
         if self._context.get('tracking') == "exported":
             domain = expression.AND([[('export_state', '!=', 1)], domain])
         return domain
+
+def write(self, values):
+    return super().write(values)
+
+WtTimeLogBase.write = write
