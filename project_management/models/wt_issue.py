@@ -387,7 +387,11 @@ class WtProject(models.Model):
 
     # ========================= AUTOMATE ACTION ==============
     def get_daily_tasks(self, date):
-            user_date = date.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(self.env.user.tz or "UTC")).date()
+            _logger.info(date)
+            user_datetime = date.astimezone(pytz.timezone(self.env.user.tz or "UTC"))
+            user_date = user_datetime.date()
+            _logger.info(user_datetime)
+            _logger.info(user_date)
             issue = self.search([('project_id.personal_id', '=', self.env.user.id), ('applicable_date', '=', user_date)], limit=1) 
             if not issue:
                 project = self.env['wt.project'].sudo().gather_personal_project()
