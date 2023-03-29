@@ -141,22 +141,27 @@ class WtTimeLog(models.Model):
     
     def compare_with_external(self, keys={'start_date', 'duration', 'description'}):
         if self:
-            logs_by_migration = defaultdict(lambda: self.env['wt.time.log'])
-            for log in self:
-                logs_by_migration[log.issue_id.migration_id] |= log
-            wt_datas = []
-            for migration, logs in logs_by_migration.items():
-                wt_datas.append(migration.load_work_log_by_ids_raw(logs.mapped('id_on_wt'), self.env.user))
-            raw_log_by_wt_id = dict()
-            for log in wt_datas:
-                raw_log_by_wt_id[log['id_on_wt']] = log
             res = defaultdict(dict)
             for log in self:
-                res[log.id] = None
-                if raw_log_by_wt_id(log.id_on_wt):
-                    res[log.id] = {}
-                    for key in keys:
-                        res[log.id][key] = (log.key, raw_log_by_wt_id[log.id_on_wt].get(key))
+                for key in keys:
+                    res[log.id][key] = (self.key, getattr(self, 'capture_export_%s'%key))
+            
+            # logs_by_migration = defaultdict(lambda: self.env['wt.time.log'])
+            # for log in self:
+            #     logs_by_migration[log.issue_id.migration_id] |= log
+            # wt_datas = []
+            # for migration, logs in logs_by_migration.items():
+            #     wt_datas.append(migration.load_work_log_by_ids_raw(logs.mapped('id_on_wt'), self.env.user))
+            # raw_log_by_wt_id = dict()
+            # for log in wt_datas:
+            #     raw_log_by_wt_id[log['id_on_wt']] = log
+            # res = defaultdict(dict)
+            # for log in self:
+            #     res[log.id] = None
+            #     if raw_log_by_wt_id(log.id_on_wt):
+            #         res[log.id] = {}
+            #         for key in keys:
+            #             res[log.id][key] = (log.key, raw_log_by_wt_id[log.id_on_wt].get(key))
             return res
 
 
