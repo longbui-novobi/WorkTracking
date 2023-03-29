@@ -62,7 +62,7 @@ class WtTimeLog(models.Model):
             value += 5
         if 'description' in values and self.description != values['description']:
             value += 3
-        return value
+        return value or 1
 
     def write(self, values):
         res = True 
