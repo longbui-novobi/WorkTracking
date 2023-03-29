@@ -788,6 +788,31 @@ class TaskMigration(models.Model):
                 if to_create:
                     self.env['wt.time.log'].create(to_create)
 
+    def load_work_log_by_ids_raw(self, ids, users):
+        self = self.with_context(bypass_cross_user=True)
+        if self.import_work_log:
+            new_logs = []
+            for user in users:
+                mapping = ImportingJiraWorkLog(self.server_type, self.wt_server_url)
+                headers = self.with_user(user).__get_request_headers()
+                local_data = {'dict_user': {}}
+                request = {
+                    'endpoint': f"{self.wt_server_url}/worklog/list",
+                    'method': 'post',
+                    'body': {'ids': ids}
+                }
+                logs = self.make_request(request, headers)
+                logs = mapping.parse_logs(logs)
+                for log in logs:
+                    new_logs.append(self.prepare_worklog_data(local_data, log, {}, {}))
+                wt_ids = list(map(lambda r: r['id_on_wt'], new_logs))
+                if set(ids) - set(wt_ids):
+                    break
+                else:
+                    continue
+            return new_logs
+        return []
+
     @api.model
     def _get_time_log_payload(self, time_log_id):
         return {
