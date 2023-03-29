@@ -53,7 +53,7 @@ class WtIssueMigration(WtIssue):
 
     @handling_req_res
     @http.route(['/management/issue/work-log/compare'], type="http", cors="*", methods=["POST"], auth="jwt", csrf=False)
-    def export_issue_to_server(self, **kwargs):
+    def compare_log_to_server(self, **kwargs):
         data = request.env['wt.time.log'].browse(kwargs.get('ids', [])).compare_with_external()
         return http.Response(json.dumps(data), content_type='application/json', status=200)
 
