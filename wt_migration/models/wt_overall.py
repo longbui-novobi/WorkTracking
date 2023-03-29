@@ -52,7 +52,9 @@ class WtTimeLog(models.Model):
     def _get_export_state(self, values):
         self.ensure_one() 
         _logger.info(values)
-        
+        _logger.info(self.start_date)
+        _logger.info(self.duration)
+        _logger.info(self.description)
         value = 0
         if 'start_date' in values and self.start_date != values['start_date']:
             value += 7
@@ -69,8 +71,8 @@ class WtTimeLog(models.Model):
             values['start_date'] = datetime.fromtimestamp(values['start_date'])
         # END  PROJECT MANAGEMENT
 
-        if type(values.get('start_date', None)) in (int, float):
-            values['start_date'] = datetime.fromtimestamp(values['start_date'])
+        if type(values.get('description', None)) == str:
+            values['description'] = values['description'].strip()
         if not self._context.get("bypass_cross_user"):
             user = self.env.user 
             other_logs = self.filtered(lambda log: log.user_id != user)
