@@ -436,4 +436,6 @@ class WtProject(models.Model):
                     if step_acs:
                         to_update_acs |= step_acs
                     to_update_acs.issue_id = today_issue.id
-            # empty_daily_issue_user_ids.unlink()
+        to_be_remove_issues = yesterday_issues.filtered(lambda issue: not (bool(issue.ac_ids) or bool(issue.work_log_ids) or bool(issue.time_log_ids)))
+        if to_be_remove_issues:
+            to_be_remove_issues.unlink()
