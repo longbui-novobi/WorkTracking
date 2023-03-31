@@ -436,4 +436,4 @@ class WtProject(models.Model):
                     if step_acs:
                         to_update_acs |= step_acs
                     to_update_acs.issue_id = today_issue.id
-            empty_daily_issue_user_ids.unlink()
+            # empty_daily_issue_user_ids.unlink()
