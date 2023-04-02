@@ -951,7 +951,7 @@ class TaskMigration(models.Model):
                 if board.get('id') not in existed_boards:
                     project = project_by_key[board.get('location', {}).get('projectKey', '')]
                     if project:
-                        self.env["wt.board.board"].sudo().create({
+                        self.env["board.board"].sudo().create({
                             'id_on_wt': board['id'],
                             'name': board['name'],
                             'type': board['type'],
@@ -962,7 +962,7 @@ class TaskMigration(models.Model):
         if not self.wt_agile_url:
             return
         if not board_ids:
-            board_ids = self.env['wt.board.board'].sudo().search([])
+            board_ids = self.env['board.board'].sudo().search([])
         allowed_user_ids = self.env['res.users'].search([]).token_exists()
         header_by_user = {self.env.user.id: self.__get_request_headers()}
         board_ids = board_ids.filtered(lambda r: r.type == "scrum")
