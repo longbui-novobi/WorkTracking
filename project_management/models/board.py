@@ -2,7 +2,7 @@ from odoo import models, api, fields, _
 
 
 class Board(models.Model):
-    _name = "board.board"
+    _name = "wt.board.board"
     _description = "Project Management Board"
     _order = 'is_favorite desc, id desc'
 

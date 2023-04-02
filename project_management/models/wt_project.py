@@ -17,7 +17,7 @@ class WtProject(models.Model):
     issue_ids = fields.One2many('wt.issue', 'project_id', string='Issues')
     wt_migration_id = fields.Many2one("wt.migration", string="Task Migration Credentials")
     chain_work_ids = fields.One2many("wt.chain.work.session", "project_id", "Chain Works")
-    board_ids = fields.One2many('board.board', 'project_id', string="Boards")
+    board_ids = fields.One2many('wt.board.board', 'project_id', string="Boards")
     sprint_ids = fields.One2many('agile.sprint', 'project_id', string="Sprints")
     personal_id = fields.Many2one("res.users", string="Personal Board User")
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
-    <record id="board_board_kanban_view" model="ir.ui.view">
+    <record id="model_wt_board_board_kanban_view" model="ir.ui.view">
         <field name="name">Boards</field>
         <field name="priority">1</field>
-        <field name="model">board.board</field>
+        <field name="model">wt.board.board</field>
         <field name="arch" type="xml">
             <kanban string="Boards" sample="1" create="0" edit="0">
                 <field name="name"/>
@@ -37,9 +37,9 @@
         </field>
     </record>
 
-    <record id="board_board_search_view" model="ir.ui.view">
+    <record id="model_wt_board_board_search_view" model="ir.ui.view">
         <field name="name">Boards</field>
-        <field name="model">board.board</field>
+        <field name="model">wt.board.board</field>
         <field name="arch" type="xml">
             <search>
                 <field name="project_id"/>
@@ -49,9 +49,9 @@
         </field>
     </record>
 
-    <record id="action_board_board" model="ir.actions.act_window">
+    <record id="action_model_wt_board_board" model="ir.actions.act_window">
         <field name="name">Boards</field>
-        <field name="res_model">board.board</field>
+        <field name="res_model">wt.board.board</field>
         <field name="view_mode">kanban</field>
         <field name="context">{'search_default_my_project': 1}</field>
     </record>

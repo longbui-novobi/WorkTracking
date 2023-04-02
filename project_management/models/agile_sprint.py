@@ -7,6 +7,6 @@ class AgileSprint(models.Model):
 
     name = fields.Char(string="Name", required=1)
     project_id = fields.Many2one("wt.project", string="Project")
-    board_id = fields.Many2one("board.board", string="Board")
+    board_id = fields.Many2one("wt.board.board", string="Board")
     state = fields.Selection([('closed', 'Closed'), ('active', "In Progress"), ('future', "Future")], string="Status")
     issue_ids = fields.Many2many("wt.issue", string="Issues")
