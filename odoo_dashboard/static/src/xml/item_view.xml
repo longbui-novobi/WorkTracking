@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template xml:space="preserve">
+    <t t-name="GridStackElement" owl="1">
+        <t t-if="itemId !== null">
+            <div class="grid-stack-item" t-att-id="displayID"
+                 t-att-gs-x="layoutConfig.x"
+                 t-att-gs-y="layoutConfig.y"
+                 t-att-gs-w="layoutConfig.width"
+                 t-att-gs-h="layoutConfig.height"
+                 t-att-gs-min-w="layoutConfig.min_width"
+                 t-att-gs-min-h="layoutConfig.min_height"
+                 t-on-refresh-btn-click="onRefreshItem"
+                 t-on-change-filter-value="onChangeFilter"
+                 t-on-item-mounted="onItemMounted"
+                 t-on-item-advance-click="onAdvanceItem"
+                 t-on-filter-rendered="__checkFilter"
+                 t-on-title-state="onTriggerTitleState"
+                 t-on-kpi-value-click="onKPIValueClick"
+                 t-on-open-form-record="onOpenFormRecord"
+                 t-on-trigger-reset-paging-event="onCatchPagingReset"
+                 t-on-extract-xlsx="onExtractXLSX"
+                 t-on-open-chart-tooltip="openChartEventFromKey"
+                 t-on-item-title-click="onItemTitleClick"
+                 style="display:none"
+            >
+                <div class="grid-stack-item-content" t-ref="content">
+                </div>
+            </div>
+        </t>
+    </t>
+
+    <!--    <t t-name="item_view.itemControlBar">-->
+    <t t-name="ItemControlBar" owl="1">
+        <div class="ml-auto header-controller">
+            <div class="view-control d-flex align-items-center justify-content-end row" t-ref="filter-content">
+            </div>
+        </div>
+    </t>
+
+
+    <!--    <t t-name="item_view.itemTitle">-->
+    <t t-name="ItemTitle" owl="1">
+        <div class="title-container d-flex flex-column" t-ref='container_content'>
+            <div class="title-content d-flex align-items-center">
+                <span class="text dashboard-item-title" t-ref="text_content" t-on-click="onClickItemTitle">
+                    <t t-foreach="state.titleSegment" t-as="titleSeg" t-key="titleSeg">
+                        <span> <t t-esc="titleSeg"/> </span>
+                    </t>
+                    <span class="d-inline-block"> 
+                        <span class="d-flex align-items-center">
+                            <t t-esc="state.finalTitleSegment"/>
+                            <t t-if="state.description">
+                                <div class="handle-info d-inline-block icon" t-ref="icon_content"
+                                     t-on-mouseover="onMouseOverPopup" t-on-mouseleave='onMouseLeavePopup'>
+                                <i class="fa fa-info"></i>
+                            </div>
+                            </t>
+                        </span>
+                    </span>
+                </span>
+                <div class="title-info d-inline-block">
+                    <div class="info-popup" t-ref="popup_content">
+                        <span>
+                            <t t-if="state.description" t-esc="state.description"></t>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!--            <div class="title-time-manage d-flex align-items-center">-->
+            <!--                <span class="mini-size">-->
+            <!--                    Last updated:-->
+            <!--                    <span class="content">-->
+            <!--                        <t t-esc="props.lastUpdated"></t>-->
+            <!--                    </span>-->
+            <!--                    <span class="title-info d-inline-block">-->
+            <!--                        <button class="refresh-btn fa fa-refresh" t-on-click="onRefreshItem"></button>-->
+            <!--                    </span>-->
+            <!--                </span>-->
+            <!--            </div>-->
+        </div>
+    </t>
+
+    <!--    <t t-name="item_view.ItemNavigation">-->
+    <t t-name="ItemNavigation" owl="1">
+        <div class="ml-auto item-handle-btn">
+            <div class="d-flex align-items-center ctn" t-ref="base_content">
+                <div class="ml-auto"></div>
+                <div class="item time-tools">
+                    <div>
+                        <button t-attf-class="btn btn-advance {{(env.status)?'dashboard_show':'dashboard_hide'}}"
+                                t-on-click="onClickAdvanceBtn">
+                            <i class="fa fa-ellipsis-h"></i>
+                        </button>
+                        <div class="popup" t-ref="popup_content">
+                                <div class="padding-popup"></div>
+                            <div class="d-flex flex-column">
+                                <button class="btn btn-close" t-on-click="onClickCopyBtn">
+                                    <div>
+                                    <i class="fa fa-times" style="transform: rotateZ(45deg);"></i>
+                                        <span>Add to ...</span></div>
+                                </button>
+                                <button class="btn btn-close" t-on-click="onClickMoveBtn">
+                                    <div>
+                                    <i class="fa fa-arrow-circle-right"></i>
+                                        <span>Move to ...</span></div>
+                                </button>
+                                <button class="btn btn-close" t-on-click="onClickDuplicateBtn">
+                                    <div>
+                                    <i class="fa fa-copy"></i>
+                                        <span>Duplicate</span></div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item time-tools">
+                    <div>
+                        <button t-attf-class="btn btn-close {{(env.status)?'dashboard_show':'dashboard_hide'}}"
+                                t-on-click="onClickRemoveBtn">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--    <t t-name="item_view.ItemTitleFrame">-->
+    <t t-name="ItemTitleFrame" t-on-title-state="triggerUpTitleState" owl="1">
+        <div class="item-header">
+            <ItemNavigation/>
+            <div class="item-h-content">
+                <div class="header-title d-flex align-items-center">
+                    <ItemTitle/>
+                </div>
+                <!-- Controller bar -->
+                <ItemControlBar t-props="props"/>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="GridChartElement" owl="1">
+        <div class="board-item">
+            <div class="template template-1">
+                <ItemTitleFrame t-props="props"/>
+                <t t-if="state.additional_info">
+                    <div class="d-flex justify-content-end pr-3 pt-2">
+                        <table class="chart-tooltips">
+                            <tbody>
+                                <tr t-foreach="state.additional_info" t-as="cluster" t-key="cluster">
+                                    <td t-attf-class="title {{cluster.key ? 'clickable' : ''}}" t-att-key="cluster.key"
+                                        t-on-click="openChartEventFromKey"><t t-esc="cluster.title"/></td>
+                                    <td class="content"><t t-esc="cluster.content"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+                <div class="item-content">
+                    <canvas id="chart-content" t-ref='canvas'></canvas>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--    <t t-name="item_view.template_2">-->
+    <t t-name="GridMixedElement" owl="1">
+        <div class="board-item">
+            <div class="template template-2 d-flex flex-column">
+                <ItemTitleFrame t-props="props"/>
+                <div class="item-content d-flex align-items-center flex-grow-1">
+                    <div class="template-2-content d-flex flex-row">
+                        <div class="title d-flex align-items-center">
+                            <div>
+                                <h1 t-att-id="bodyTitleID" class="dashboard-kpi-value"
+                                    t-on-click="onClickKPIValue"><t t-esc="kpiState.displayValue"/></h1>
+                                <div t-att-class="kpiState.showIndicator ? 'description' : 'description hidden-indicator'">
+                                    <div t-att-class="kpiState.trend">
+                                        <p t-att-class="kpiState.isGood ? 'good' : 'bad'">
+                                            <div>
+                                            <span t-att-id="bodyDesID"><t t-esc="kpiState.changeValuePercent"/></span>
+                                                vs. last period
+                                            </div>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart d-flex align-items-center ">
+                            <canvas id="chart-content" t-ref='canvas'></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+
+    <!--    <t t-name="item_view.template_3">-->
+    <t t-name="GridKPIElement" owl="1">
+        <div class="board-item">
+            <div class="template template-3 d-flex flex-column">
+                <div class="t3-top d-flex flex-column">
+                    <div class="item-header ">
+                        <ItemNavigation/>
+                    </div>
+                    <div class="item-content d-flex align-items-center justify-content-between">
+                        <div class="title d-flex align-items-center">
+                            <div>
+                                <div class="kpi-content">
+                                <h1 t-att-id="bodyTitleID" t-esc="kpiState.displayValue" t-on-click="onClickKPIValue"
+                                    class="dashboard-kpi-value"/>
+                                    <span t-if="kpiState.isTarget" t-attf-class="target {{kpiState.targetClass}}">
+                                        / <t t-esc="kpiState.target"/>
+                                        (<t t-esc="kpiState.targetRatio"/>)
+                                    </span>
+                                </div>
+                                <div t-att-class="kpiState.showIndicator ? 'description' : 'description hidden-indicator'">
+                                    <div t-att-class="kpiState.trend">
+                                        <p t-att-class="kpiState.isGood ? 'good' : 'bad'">
+                                            <div>
+                                            <span t-att-id="bodyDesID"><t t-esc="kpiState.changeValuePercent"/></span>
+                                                vs. last period
+                                            </div>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-footer">
+                    <ItemTitle/>
+                    <div class="title-img">
+                        <div class="img">
+                            <img t-if="kpiState.iconUrl !== false" class="img-hold" t-attf-id="image_{{itemId}}"
+                                 t-attf-src="data:image/gif;base64,{{kpiState.iconUrl}}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="GridGaugeElement" owl="1" t-on-restrict-update-method="updateMaximum">
+        <div class="board-item">
+            <div class="template template-4 d-flex flex-column">
+                <ItemTitleFrame t-props="props"/>
+                <div class="item-content d-flex align-items-center flex-grow-1">
+                    <div class="template-4-content d-flex flex-column align-items-center">
+                        <div class="chart d-flex justify-content-center ">
+                            <canvas id="chart-content" t-ref='canvas'></canvas>
+                        </div>
+                        <div class="title d-flex justify-content-center">
+                            <div>
+                                <div t-att-class="kpiState.showIndicator ? 'description' : 'description hidden-indicator'">
+                                    <div t-att-class="kpiState.trend">
+                                        <p t-att-class="kpiState.isGood ? 'good' : 'bad'">
+                                            <div>
+                                            <span t-att-id="bodyDesID"><t t-esc="kpiState.changeValuePercent"/></span>
+                                                vs. last period
+                                            </div>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="GridListElement" owl="1">
+        <div class="board-item"
+             t-on-restrict-update="catchEventRestrict">
+            <div class="template template-5">
+                <ItemTitleFrame t-props="props"/>
+                <div class="o_content" style="overflow: auto;font-size: 90%;">
+                    <div class="o_list_view" t-ref="listview">
+                        <div class="table-responsive">
+                            <table class="o_list_table table table-sm table-hover table-striped o_list_table_ungrouped"
+                                   style="table-layout: fixed;">
+                                <thead>
+                                    <tr t-ref="header">
+                                    </tr>
+                                </thead>
+                                <tbody class="ui-sortable" t-ref="content">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div t-ref='nodata' class="o_view_nocontent o_hidden">
+                        <div class="o_nocontent_help">
+                            <p class="o_view_nocontent_smiling_face">
+                            No Data Available!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template>
+    <t t-name="odoo_dashboard_builder.dashboardBuilder">
+        <div class="dashboard_builder_container" id="base">
+            <div class="dashboard_builder_control_panel">
+                <div class="dashboard_header">
+                    <div class="dashboard_builder_title breadcrumb">
+                        <t t-if="widget.previewMode">
+                            <li class="breadcrumb-item o_back_button">
+                                <t t-esc="widget.previewName"/>
+                            </li>
+                            <li class="breadcrumb-item">Layout Preview
+                            </li>
+                        </t>
+                        <t t-else="">
+                            <span>
+                                <t t-esc="widget.dashboard_name"/>
+                            </span>
+                        </t>
+                    </div>
+                    <div class="dashboard_button_box row m-0">
+                        <div class="dashboard_button_box_left col-md-6">
+                            <button id="btn_edit_layout" class="btn btn-primary dashboard_show btn_edt_layout">
+                                <!--                                <span class="fa fa-lg fa-pencil"/>-->
+                                Edit
+                            </button>
+                            <t t-if="!widget.previewMode">
+                                <button t-if="widget.isManager"
+                                        id="btn_add_new_item"
+                                        class="btn btn-secondary dashboard_show btn_add_item">
+                                    <!--                                <span class="fa fa-lg fa-pencil"/>-->
+                                    Add New Item
+                                </button>
+                            </t>
+                            <t t-if="!widget.previewMode">
+                                <div class="dashboard_show" >
+                                    <button  id="btn_export_to_pdf"
+                                            class="btn-export-layout btn btn-secondary fa fa-download">
+                                    </button>
+                                    <ul class="export_option" id="export-dropdown">
+                                        <li id="export2pdf"><i class="fa fa-file-pdf-o"/> Export as PDF</li>
+                                        <li id="export2img"><i class="fa fa-file-image-o" />Export as Image</li>
+                                    </ul>
+                                </div>
+                            </t>
+
+                            <t t-if="!widget.previewMode &amp;&amp; widget.is_show_last_updated">
+                                <div class="last_updated_info dashboard_show">
+                                    <span>Last updated:</span>
+                                    <span id="last_update_time">
+                                        <t t-esc="widget.lastUpdated"/>
+                                    </span>
+                                    <span class="title-info d-inline-block">
+                                        <button class="fa fa-refresh" id="refresh-btn"></button>
+                                    </span>
+                                </div>
+                            </t>
+                            <!-- Will be shown if users click on Edit button -->
+                            <button id="btn_save_layout" class="btn btn-primary btn_save_layout dashboard_hide">
+                                Save
+                            </button>
+                            <button id="btn_discard_layout"
+                                    class="btn btn-secondary btn_dashboard_discard btn_discard_layout dashboard_hide">
+                                Discard
+                            </button>
+                        </div>
+                        <div class="dashboard_button_box_middle dashboard_show col-md-6">
+                            <div class="d-flex row" style="max-width:100vw;">
+                                <t t-foreach="widget.generalFilters" t-as="filter" t-key="filter">
+                                    <t t-set="obj" t-value="widget.generalFilters[filter]"/>
+                                    <button t-att-class="((obj.line_icon)? 'lc ':'') + 'dashboard_background_field_select btn_inline' "
+                                            t-attf-id="board-{{filter}}">
+                                        <span t-attf-class=" fa {{widget.generalFilters[filter].icon}} btn_icon_inline"/>
+                                        <div class="select-selected" t-on-click="_showingDropdown"
+                                             t-att-type="filter">
+                                            <t t-if="obj.line_icon">
+                                                <t t-esc="obj.options[obj.select][0]"></t>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="obj.options[obj.select]"></t>
+                                            </t>
+                                        </div>
+                                        <div class="select-items select-hide">
+                                            <t t-foreach="obj.options" t-as="option"
+                                               t-raw="val">
+                                                <t t-if="option.substring(0,3)==='hrl'">
+                                                    <hr style="margin:5px 0px;"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <div t-att-class="((option===obj.select)? 'selected':'')"
+                                                         t-on-click="_selectedChange" t-att-val="option">
+                                                        <t t-if="obj.line_icon">
+                                                            <t t-if="obj.options[option][1]">
+                                                                <span class="logo">
+                                                                    <img t-att-src="obj.options[option][1]"/>
+                                                                </span>
+                                                            </t>
+                                                            <t t-esc="obj.options[option][0]"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <t t-esc="obj.options[option]"/>
+                                                        </t>
+                                                    </div>
+                                                </t>
+                                            </t>
+                                        </div>
+                                    </button>
+                                </t>
+                            </div>
+
+                        </div>
+                        <div class="dashboard_button_box_right">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </t>
+
+    <t t-name="GridStackComponent" owl="1">
+        <div class="grid-stack" t-ref="grid-content"
+             t-on-item-advance="onItemAdvance"
+             t-on-item-ready="__triggerReadyItem"
+             t-on-open-detailed-view="onOpenDetailedView"
+        ></div>
+    </t>
+</template>

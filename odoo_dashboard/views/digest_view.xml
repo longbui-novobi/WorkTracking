@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="odoo_dashboard_builder.action_digest_emails_view" model="ir.actions.act_window">
+        <field name="domain">[('kpi_omni_dashboard', '=', True)]</field>
+        <field name="context">{'default_kpi_omni_dashboard': True}</field>
+    </record>
+</odoo>

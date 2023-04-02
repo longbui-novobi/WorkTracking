@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="bi_dashboard_recompute_interval" model="ir.config_parameter">
+            <field name="key">odoo_dashboard_builder.recompute_interval</field>
+            <field name="value">30</field>
+        </record>
+
+        <record id="bi_dashboard_data_range" model="ir.config_parameter">
+            <field name="key">odoo_dashboard_builder.data_range</field>
+            <field name="value">45</field>
+        </record>
+
+        <record id="bi_dashboard_last_updated_time" model="ir.config_parameter">
+            <field name="key">odoo_dashboard_builder.last_updated</field>
+            <field name="value"></field>
+        </record>
+
+        <record id="bi_dashboard_launch_count" model="ir.config_parameter">
+            <field name="key">odoo_dashboard_builder.has_initialized_data</field>
+            <field name="value">True</field>
+        </record>
+    </data>
+</odoo>

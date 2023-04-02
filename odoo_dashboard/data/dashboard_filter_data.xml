@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="bi_dashboard_sales_team_filter" model="bi.dashboard.filter.type">
+            <field name="name">Sales Team Filter</field>
+            <field name="type">team</field>
+            <field name="default_value">0</field>
+        </record>
+
+        <record id="bi_dashboard_period_filter" model="bi.dashboard.filter.type">
+            <field name="name">Period Filter</field>
+            <field name="type">period</field>
+            <field name="default_value">this_month</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="digest_digest_view_form_inherit" model="ir.ui.view">
+        <field name="name">digest.digest.view.form.inherit</field>
+        <field name="model">digest.digest</field>
+        <field name="priority">10000</field>
+        <field name="inherit_id" ref="digest.digest_digest_view_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="replace">
+                <header>
+                    <button type="object" name="action_subscribe" string="Subscribe"
+                            class="oe_highlight"
+                            attrs="{'invisible': ['|',('is_subscribed', '=', True), ('state','=','deactivated')]}"/>
+                    <button type="object" name="action_unsubcribe" string="Unsubscribe me"
+                            class="oe_highlight"
+                            attrs="{'invisible': ['|',('is_subscribed', '=', False), ('state','=','deactivated')]}"/>
+                    <button type="object" name="action_deactivate" string="Deactivate for everyone"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('state','=','deactivated')]}"
+                            groups="odoo_dashboard_builder.dashboard_group_user"/>
+                    <button type="object" name="action_activate" string="Activate"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('state','=','activated')]}"
+                            groups="odoo_dashboard_builder.dashboard_group_user"/>
+                    <button type="object" name="action_send" string="Send Now"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('state','=','deactivated')]}"
+                            groups="odoo_dashboard_builder.dashboard_group_user"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+            </xpath>
+            <xpath expr="//page[@name='kpis']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='how_to']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='recipients']" position="attributes">
+                <attribute name="groups">odoo_dashboard_builder.dashboard_group_user</attribute>
+                <attribute name="string">Recipients</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="attributes">
+                <attribute name="domain">[('is_dashboard_user', '=', True)]</attribute>
+                <attribute name="options">{'no_create': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_digest_emails_view" model="ir.actions.act_window">
+        <field name="name">Digest Emails</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">digest.digest</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('digest.digest_digest_view_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('odoo_dashboard_builder.digest_digest_view_form_inherit')})]"/>
+    </record>
+</odoo>

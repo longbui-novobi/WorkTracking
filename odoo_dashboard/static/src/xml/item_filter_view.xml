@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template>
+    <t t-name="BaseFilter" owl="1">
+        <t t-if="displayMode === true">
+            <button t-attf-class="tr many2one many2one-content {{line_icon ? 'lc' : ''}}">
+                <div class="m2o">
+                    <span class="icon" t-attf-for="f-p-{{env.displayID}}">
+                        <i t-attf-class="fa {{icon}}"></i>
+                    </span>
+                    <div class="select-selected" t-on-click="_showingDropdown" t-ref="selectionTag">
+                        <t t-if="line_icon">
+                            <t t-esc="options[select][0]"/>
+                        </t>
+                        <t t-else="">
+                            <t t-esc="options[select]"/>
+                        </t>
+                    </div>
+                    <div class="select-items select-hide" t-ref="dropdownTag">
+                        <t t-foreach="options" t-as="option" t-key="option">
+                            <t t-if="option==='drop_hr_line'">
+                                <hr style="margin:5px 0px;"/>
+                            </t>
+                            <t t-else="">
+                                <div t-att-class="option===select ? 'selected' : ''" t-on-click="_selectedChange"
+                                     t-att-val="option">
+                                    <t t-if="line_icon &amp;&amp; options[option][1]">
+                                        <span class="logo">
+                                            <img t-att-src="options[option][1]"/>
+                                        </span>
+                                    </t>
+                                    <t t-if="line_icon">
+                                        <t t-esc="options[option][0]"/>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-esc="options[option]"/>
+                                    </t>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+            </button>
+        </t>
+    </t>
+    <t t-name="RestrictFilter" owl="1">
+        <t t-if="displayMode === true">
+            <div aria-label="Pager" class="o_pager">
+                <span class="o_pager_counter">
+                    <span class="inp" t-ref="PreviousTag" t-on-keydown='_onListKeyDown' contenteditable="true">
+                        <t t-esc="offset"/>
+                    </span>
+                    <span>-</span>
+                    <span class="inp" t-ref="NextTag" t-on-keydown='_onListKeyDown' contenteditable="true">
+                        <t t-esc="end"/>
+                    </span>
+                    <span>/</span>
+                    <span t-ref="MaxTag">
+                        <t t-esc="max"/>
+                    </span>
+                </span>
+                <span aria-atomic="true" class="btn-group restrict-content">
+                    <button type="button" t-ref="PreviousButton" title="Previous" class="fa fa-chevron-left"
+                            t-on-click="_ChangeListRange('prev')"></button>
+                    <button type="button" t-ref="NextButton" atitle="Next" class="fa fa-chevron-right"
+                            t-on-click="_ChangeListRange('next')"></button>
+                </span>
+            </div>
+        </t>
+    </t>
+
+    
+    <t t-name="SearchFilter" owl="1">
+        <t t-if="displayMode === true">
+            <div aria-label="Pager" class="o_pager">
+                <div class="o_searchview_input_item" style="position: relative;">
+                    <input t-ref="search" type="text" placeholder="Search..." t-on-keyup="_onKeyUp" class="o_searchview_input_item" />
+                    <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon fa fa-search"></i>
+                </div>
+            </div>
+        </t>
+    </t>
+
+</template>
+
