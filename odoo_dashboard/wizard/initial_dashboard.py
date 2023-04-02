@@ -20,7 +20,7 @@ class DashboardBoard(models.TransientModel):
             return {
                 'type': 'ir.actions.client',
                 'name': board.name,
-                'tag': 'odoo_dashboard_builder',
+                'tag': 'odoo_dashboard',
                 'params': {'dashboard_id': board_id},
             }
         return True

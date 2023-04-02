@@ -1,4 +1,4 @@
-// odoo.define('odoo_dashboard_builder.BasicView', function (require) {
+// odoo.define('odoo_dashboard.BasicView', function (require) {
 //     "use strict";
 //
 //     var BasicView = require('web.BasicView');

@@ -1,10 +1,10 @@
-odoo.define('odoo_dashboard_builder.DashboardItemSubcomponents', function (require) {
+odoo.define('odoo_dashboard.DashboardItemSubcomponents', function (require) {
     "use strict";
 
     const {Component} = owl;
     const {useState, useRef} = owl.hooks;
 
-    var Filter = require('odoo_dashboard_builder.DashboardItemFilter');
+    var Filter = require('odoo_dashboard.DashboardItemFilter');
 
     const parsingFilter = {
         'range':Filter.Restrict,

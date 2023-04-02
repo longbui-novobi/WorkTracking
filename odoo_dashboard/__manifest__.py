@@ -23,11 +23,11 @@
         'data/digest_data.xml',
         
         # 'views/assets.xml',
-        'views/dashboard_builder_settings.xml',
-        'views/dashboard_builder_views.xml',
-        'views/dashboard_builder_config_views.xml',
+        'views/dashboard_settings.xml',
+        'views/dashboard_views.xml',
+        'views/dashboard_config_views.xml',
         'views/dashboard_digest_email_views.xml',
-        'views/dashboard_builder_menu.xml',
+        'views/dashboard_menu.xml',
         'views/digest_view.xml',
         
         'wizard/initial_dashboard.xml',
@@ -37,25 +37,25 @@
     "uninstall_hook": "uninstall_hook",
     'assets': {
         'web.assets_backend': [
-            'odoo_dashboard_builder/static/src/css/dashboard_builder_style.scss',
-            'odoo_dashboard_builder/static/src/css/item_style.scss',
-            'odoo_dashboard_builder/static/src/css/dashboard_action_popup_style.scss',
-            'odoo_dashboard_builder/static/src/js/owl/dashboard_builder_owl.js',
-            'odoo_dashboard_builder/static/src/js/owl/dashboard_item_filter_owl.js',
-            'odoo_dashboard_builder/static/src/js/owl/dashboard_item_subcomponents_owl.js',
-            'odoo_dashboard_builder/static/src/js/owl/dashboard_item_template_owl.js',
-            'odoo_dashboard_builder/static/src/js/owl/dashboard_item_owl.js',
-            'odoo_dashboard_builder/static/src/js/owl/dashboard_grid_owl.js',
-            'odoo_dashboard_builder/static/src/js/owl/basic_view_inherit.js',
-            'odoo_dashboard_builder/static/src/js/hook/custom_filter_hook.js',
-            'odoo_dashboard_builder/static/src/js/owl/list_view_header_button.js',
-            'odoo_dashboard_builder/static/src/js/hook/custom_popup.js',
-            'odoo_dashboard_builder/static/src/js/owl/preview/item_preview.js',
-            'odoo_dashboard_builder/static/src/js/hook/list_view_cell.js'
+            'odoo_dashboard/static/src/css/dashboard_style.scss',
+            'odoo_dashboard/static/src/css/item_style.scss',
+            'odoo_dashboard/static/src/css/dashboard_action_popup_style.scss',
+            'odoo_dashboard/static/src/js/owl/dashboard_owl.js',
+            'odoo_dashboard/static/src/js/owl/dashboard_item_filter_owl.js',
+            'odoo_dashboard/static/src/js/owl/dashboard_item_subcomponents_owl.js',
+            'odoo_dashboard/static/src/js/owl/dashboard_item_template_owl.js',
+            'odoo_dashboard/static/src/js/owl/dashboard_item_owl.js',
+            'odoo_dashboard/static/src/js/owl/dashboard_grid_owl.js',
+            'odoo_dashboard/static/src/js/owl/basic_view_inherit.js',
+            'odoo_dashboard/static/src/js/hook/custom_filter_hook.js',
+            'odoo_dashboard/static/src/js/owl/list_view_header_button.js',
+            'odoo_dashboard/static/src/js/hook/custom_popup.js',
+            'odoo_dashboard/static/src/js/owl/preview/item_preview.js',
+            'odoo_dashboard/static/src/js/hook/list_view_cell.js'
         ],
         'web.assets_qweb': [
-            'odoo_dashboard_builder/static/src/xml/*.xml',
-            'odoo_dashboard_builder/static/src/xml/preview/*.xml'
+            'odoo_dashboard/static/src/xml/*.xml',
+            'odoo_dashboard/static/src/xml/preview/*.xml'
         ],
     },
     'license': 'LGPL-3',

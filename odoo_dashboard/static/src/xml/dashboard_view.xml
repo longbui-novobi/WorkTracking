@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <template>
-    <t t-name="odoo_dashboard_builder.dashboardBuilder">
-        <div class="dashboard_builder_container" id="base">
-            <div class="dashboard_builder_control_panel">
+    <t t-name="odoo_dashboard.dashboardBuilder">
+        <div class="dashboard_container" id="base">
+            <div class="dashboard_control_panel">
                 <div class="dashboard_header">
-                    <div class="dashboard_builder_title breadcrumb">
+                    <div class="dashboard_title breadcrumb">
                         <t t-if="widget.previewMode">
                             <li class="breadcrumb-item o_back_button">
                                 <t t-esc="widget.previewName"/>

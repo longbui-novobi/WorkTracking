@@ -1,4 +1,4 @@
-odoo.define('odoo_dashboard_builder.ListViewCell', function (require) {
+odoo.define('odoo_dashboard.ListViewCell', function (require) {
     'use strict';
     /*
     Return a function

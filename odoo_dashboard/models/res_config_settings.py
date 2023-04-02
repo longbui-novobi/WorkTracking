@@ -10,9 +10,9 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
     
     bi_dashboard_reload_interval = fields.Integer(string='Refresh Time',
-                                                  config_parameter='odoo_dashboard_builder.recompute_interval')
+                                                  config_parameter='odoo_dashboard.recompute_interval')
     bi_dashboard_date_range = fields.Integer(string='Days To Recompute',
-                                             config_parameter='odoo_dashboard_builder.data_range')
+                                             config_parameter='odoo_dashboard.data_range')
     show_sample_data = fields.Boolean(string='Sample Data', related='company_id.show_sample_data',
                                     readonly=False)
     
@@ -29,7 +29,7 @@ class ResConfigSettings(models.TransientModel):
     @api.model
     def set_values(self):
         res = super(ResConfigSettings, self).set_values()
-        cron_job = self.env.ref('odoo_dashboard_builder.recompute_summarized_data_cron')
+        cron_job = self.env.ref('odoo_dashboard.recompute_summarized_data_cron')
         if cron_job:
             cron_job._try_lock_dashboard_cron()
             cron_job.sudo().update({'interval_number': self.bi_dashboard_reload_interval})

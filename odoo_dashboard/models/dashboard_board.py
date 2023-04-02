@@ -127,7 +127,7 @@ class DashboardBoard(models.Model):
             existing_user_ids = board.board_group_id.users | board.archived_user_ids
             allowed_users = board.allowed_user_ids | board.allowed_group_ids.users
             valid_users = allowed_users.filtered(
-                lambda u: u.has_group('odoo_dashboard_builder.dashboard_group_user'))
+                lambda u: u.has_group('odoo_dashboard.dashboard_group_user'))
             removed_users = existing_user_ids.filtered(lambda u: u.id not in valid_users.ids)
             valid_users = valid_users - board.archived_user_ids
             # Check if allowed users already has dashboard config
@@ -169,7 +169,7 @@ class DashboardBoard(models.Model):
     def create(self, vals):
         current_user = self.env.user
         if self.env.context.get('create_from_personal_dashboard', False) and \
-                current_user.has_group('odoo_dashboard_builder.dashboard_group_user'):
+                current_user.has_group('odoo_dashboard.dashboard_group_user'):
             vals['allowed_user_ids'] = vals.get('allowed_user_ids', []) + [(4, current_user.id)]
         res = super(DashboardBoard, self).create(vals)
         # Create board layout
@@ -179,7 +179,7 @@ class DashboardBoard(models.Model):
         action_id = {
             'name': res.name,
             'res_model': 'bi.dashboard.board',
-            'tag': 'odoo_dashboard_builder',
+            'tag': 'odoo_dashboard',
             'params': {'dashboard_id': res.id},
         }
         action = self.env['ir.actions.client'].sudo().create(action_id)
@@ -223,7 +223,7 @@ class DashboardBoard(models.Model):
     
     @api.model
     def get_last_updated_time(self):
-        last_updated = self.env['ir.config_parameter'].sudo().get_param('odoo_dashboard_builder.last_updated')
+        last_updated = self.env['ir.config_parameter'].sudo().get_param('odoo_dashboard.last_updated')
         try:
             last_updated = last_updated and fields.datetime.strptime(last_updated, DEFAULT_SERVER_DATETIME_FORMAT) or ''
             return last_updated
@@ -232,7 +232,7 @@ class DashboardBoard(models.Model):
     
     @api.model
     def check_manager(self):
-        role = self.env.user.has_group('odoo_dashboard_builder.dashboard_group_manager')
+        role = self.env.user.has_group('odoo_dashboard.dashboard_group_manager')
         return role
     
     @api.model
@@ -240,10 +240,10 @@ class DashboardBoard(models.Model):
         if not board_id:
             return False
         is_initialized_data = self.env['ir.config_parameter'].sudo().get_param(
-            'odoo_dashboard_builder.has_initialized_data') == 'True'
+            'odoo_dashboard.has_initialized_data') == 'True'
         action = False
         if not is_initialized_data:
-            action = self.env.ref('odoo_dashboard_builder.action_dashboard_initial').read()[0]
+            action = self.env.ref('odoo_dashboard.action_dashboard_initial').read()[0]
             if action:
                 action['context'] = {'dashboard_id': board_id}
         return action
@@ -269,7 +269,7 @@ class DashboardBoard(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.client',
-            'tag': 'odoo_dashboard_builder',
+            'tag': 'odoo_dashboard',
             'target': 'current',
             'params': {'dashboard_id': self.id},
             'context': {'preview_layout': True, 'preview_name': self.name}

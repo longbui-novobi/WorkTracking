@@ -74,7 +74,7 @@
                                 <!--                                        type="object"/>-->
                             </page>
                             <!--                            <page id="board_configurations" string="Configurations"-->
-                            <!--                                  groups="odoo_dashboard_builder.dashboard_group_manager">-->
+                            <!--                                  groups="odoo_dashboard.dashboard_group_manager">-->
                             <!--                                <group>-->
                             <!--                                    <field name="allowed_group_ids">-->
                             <!--                                        <tree editable="bottom">-->

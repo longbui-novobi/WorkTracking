@@ -5,7 +5,7 @@ from werkzeug.urls import url_join
 from datetime import datetime
 from odoo.exceptions import UserError
 from odoo import fields, models, _, api
-from odoo.addons.odoo_dashboard_builder.utils.date_time_util import _get_date_period
+from odoo.addons.odoo_dashboard.utils.date_time_util import _get_date_period
 from odoo.tools import float_compare, format_decimalized_number
 
 
@@ -52,7 +52,7 @@ class Digest(models.Model):
             return super(Digest, self).action_send()
         else:
             is_initialized_data = self.env['ir.config_parameter'].sudo().get_param(
-                'odoo_dashboard_builder.has_initialized_data') == 'True'
+                'odoo_dashboard.has_initialized_data') == 'True'
             if is_initialized_data:
                 return self.mail_create_and_send()
             else:
@@ -138,7 +138,7 @@ class Digest(models.Model):
         web_base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         currency = self.env.company.currency_id
         rendered_body = self.env['mail.render.mixin']._render_template(
-            'odoo_dashboard_builder.bi_dashboard_digest_email',
+            'odoo_dashboard.bi_dashboard_digest_email',
             'bi.dashboard.item',
             self.ids,
             engine='qweb',
@@ -158,7 +158,7 @@ class Digest(models.Model):
             post_process=True
         )[self.id]
         full_mail = self.env['mail.render.mixin']._render_encapsulate(
-            'odoo_dashboard_builder.bi_dashboard_digest_layout',
+            'odoo_dashboard.bi_dashboard_digest_layout',
             rendered_body,
             add_context={
                 'company': company,

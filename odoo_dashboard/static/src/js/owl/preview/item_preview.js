@@ -1,4 +1,4 @@
-odoo.define('odoo_dashboard_builder.DashboardItemPreview', function (require) {
+odoo.define('odoo_dashboard.DashboardItemPreview', function (require) {
     "use strict";
 
     var registry = require('web.field_registry');
@@ -9,7 +9,7 @@ odoo.define('odoo_dashboard_builder.DashboardItemPreview', function (require) {
     var utils = require('web.utils');
     var BasicModel = require('web.BasicModel')
 
-    var ItemOwl = require('odoo_dashboard_builder.DashboardItem')
+    var ItemOwl = require('odoo_dashboard.DashboardItem')
 
     class PreviewItemOwl extends ItemOwl {
         constructor(parent, params, generalFilters = {}, status = false) {
@@ -54,13 +54,13 @@ odoo.define('odoo_dashboard_builder.DashboardItemPreview', function (require) {
     var OmniItemPreview = AbstractField.extend({
         resetOnAnyFieldChange: true,
         noLabel: true,
-        template: "odoo_dashboard_builder.ItemPreview",
+        template: "odoo_dashboard.ItemPreview",
 
         jsLibs: [
             '/web/static/lib/Chart/Chart.js',
-            '/odoo_dashboard_builder/static/lib/js/chartjs-plugin-datalabels.min.js',
-            '/odoo_dashboard_builder/static/lib/js/Chart.Geo.min.js',
-            '/odoo_dashboard_builder/static/lib/js/gauge.js',
+            '/odoo_dashboard/static/lib/js/chartjs-plugin-datalabels.min.js',
+            '/odoo_dashboard/static/lib/js/Chart.Geo.min.js',
+            '/odoo_dashboard/static/lib/js/gauge.js',
         ],
         init: function (parent, params) {
             this._super.apply(this, arguments);

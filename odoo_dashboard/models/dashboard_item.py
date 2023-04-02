@@ -135,7 +135,7 @@ class DashboardItem(models.Model):
     @api.depends('board_ids', 'board_ids.allowed_user_ids', 'board_ids.allowed_group_ids',
                  'board_ids.allowed_group_ids.users')
     def _compute_allowed_user_ids(self):
-        managers = self.env.ref('odoo_dashboard_builder.dashboard_group_manager').users
+        managers = self.env.ref('odoo_dashboard.dashboard_group_manager').users
         for item in self:
             item.allowed_user_ids = item.board_ids.allowed_user_ids + item.board_ids.allowed_group_ids.users + \
                                     item.create_uid + managers
@@ -898,7 +898,7 @@ class DashboardItem(models.Model):
             with api.Environment.manage(), db_registry.cursor() as cr:
                 env = api.Environment(cr, SUPERUSER_ID, _context)
                 try:
-                    cron = env.ref('odoo_dashboard_builder.recompute_summarized_data_cron')
+                    cron = env.ref('odoo_dashboard.recompute_summarized_data_cron')
                     if cron:
                         cron = cron.sudo()
                         cron._try_lock_dashboard_cron()
@@ -1064,8 +1064,8 @@ class DashboardItem(models.Model):
     @api.model
     def _recompute_dashboard_data(self):
         params = self.env['ir.config_parameter'].sudo()
-        has_intialize_data = params.get_param('odoo_dashboard_builder.has_initialized_data') == 'True'
-        date_interval = params.get_param('odoo_dashboard_builder.data_range')
+        has_intialize_data = params.get_param('odoo_dashboard.has_initialized_data') == 'True'
+        date_interval = params.get_param('odoo_dashboard.data_range')
         date_interval = date_interval and int(date_interval) or 45
         if not has_intialize_data:
             query_stmt = self._get_recompute_statements(None, None)
@@ -1076,8 +1076,8 @@ class DashboardItem(models.Model):
         if query_stmt:
             self.env.cr.execute(query_stmt)
         last_updated = fields.Datetime.now()
-        params.set_param('odoo_dashboard_builder.last_updated', last_updated)
-        self.env['ir.config_parameter'].sudo().set_param('odoo_dashboard_builder.has_initialized_data', True)
+        params.set_param('odoo_dashboard.last_updated', last_updated)
+        self.env['ir.config_parameter'].sudo().set_param('odoo_dashboard.has_initialized_data', True)
 
     @api.model
     def _get_recompute_statements(self, start_date, end_date):
@@ -1092,7 +1092,7 @@ class DashboardItem(models.Model):
         with db_registry.cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, _context)
             try:
-                cron = env.ref('odoo_dashboard_builder.recompute_summarized_data_cron')
+                cron = env.ref('odoo_dashboard.recompute_summarized_data_cron')
                 if cron:
                     cron = cron.sudo()
                     cron._try_lock_dashboard_cron()
@@ -1119,7 +1119,7 @@ class DashboardItem(models.Model):
 
     @api.model
     def check_update_status(self):
-        cron = self.env.ref('odoo_dashboard_builder.recompute_summarized_data_cron')
+        cron = self.env.ref('odoo_dashboard.recompute_summarized_data_cron')
         if cron:
             try:
                 cron.sudo()._try_lock_dashboard_cron()

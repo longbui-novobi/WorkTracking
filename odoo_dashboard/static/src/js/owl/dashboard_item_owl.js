@@ -1,7 +1,7 @@
-odoo.define('odoo_dashboard_builder.DashboardItem', function (require) {
+odoo.define('odoo_dashboard.DashboardItem', function (require) {
     "use strict";
 
-    var GridElementContent = require('odoo_dashboard_builder.DashboardItemTemplate');
+    var GridElementContent = require('odoo_dashboard.DashboardItemTemplate');
 
     const framework = require('web.framework');
     const session = require('web.session');
@@ -252,7 +252,7 @@ odoo.define('odoo_dashboard_builder.DashboardItem', function (require) {
         onExtractXLSX() {
             framework.blockUI();
             session.get_file({
-                url: '/dashboard_builder/list_view/extract',
+                url: '/dashboard/list_view/extract',
                 data: {
                     data: JSON.stringify({
                         "item_id": this.itemId,

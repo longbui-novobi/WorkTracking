@@ -1,4 +1,4 @@
-odoo.define('odoo_dashboard_builder.CustomFilterHook', function (require) {
+odoo.define('odoo_dashboard.CustomFilterHook', function (require) {
     "use strict";
 
     function customDateRangeUIHook(rootElement) {

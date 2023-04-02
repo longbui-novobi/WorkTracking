@@ -1,6 +1,6 @@
-odoo.define('odoo_dashboard_builder.DashboardGrid', function (require) {
+odoo.define('odoo_dashboard.DashboardGrid', function (require) {
     "use strict";
-    var GridElementComponent = require('odoo_dashboard_builder.DashboardItem');
+    var GridElementComponent = require('odoo_dashboard.DashboardItem');
     const {Component} = owl;
     const {useRef} = owl.hooks;
 

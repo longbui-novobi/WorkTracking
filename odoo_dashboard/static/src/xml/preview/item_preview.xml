@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <template xml:space="preserve">
 
-    <t t-name="odoo_dashboard_builder.ItemPreview">
+    <t t-name="odoo_dashboard.ItemPreview">
             <div class="preview">
             <h3 >* The data shown here is sample data</h3>
 

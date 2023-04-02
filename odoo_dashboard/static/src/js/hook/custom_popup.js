@@ -1,4 +1,4 @@
-odoo.define('odoo_dashboard_builder.CustomBoardPopup', function (require) {
+odoo.define('odoo_dashboard.CustomBoardPopup', function (require) {
     'use strict';
 
     var StandaloneFieldManagerMixin = require('web.StandaloneFieldManagerMixin');
@@ -93,7 +93,7 @@ odoo.define('odoo_dashboard_builder.CustomBoardPopup', function (require) {
 
     var Popup = Widget.extend({
 
-        template: 'odoo_dashboard_builder.dashboardBuilderPopup',
+        template: 'odoo_dashboard.dashboardBuilderPopup',
         events: {
             'click .close': '_onClosePopup',
             'click .btn-apply': '_onApplyAction',

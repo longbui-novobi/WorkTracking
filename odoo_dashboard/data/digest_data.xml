@@ -480,7 +480,7 @@
                                 </div>
                                 <div class="board_content">
                                     <div t-foreach="board['content']" t-as="kpi_item" class="kpi_cell">
-                                        <div t-call="odoo_dashboard_builder.bi_digest_kpi_section">
+                                        <div t-call="odoo_dashboard.bi_digest_kpi_section">
                                             <t t-set="kpi_name" t-value="kpi_item['name']"/>
                                             <t t-set="kpi_value"
                                                t-value="currency_conversion(kpi_item['thisPeriodValue'], kpi_item['formatStyle'], kpi_item['custom_unit'])"/>
@@ -523,7 +523,7 @@
                     </div>
                 </div>
 
-                <div t-if="display_mobile_banner" t-call="odoo_dashboard_builder.digest_section_mobile"/>
+                <div t-if="display_mobile_banner" t-call="odoo_dashboard.digest_section_mobile"/>
 
                 <div class="global_layout" id="footer">
                     <p style="font-weight: bold;" t-esc="company"/>

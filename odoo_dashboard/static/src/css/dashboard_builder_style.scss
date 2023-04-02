@@ -202,7 +202,7 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard_builder_container .dashboard_button_box_left .btn_edt_layout {
+  .dashboard_container .dashboard_button_box_left .btn_edt_layout {
     display: none;
     width: 55px;
     height: 30px;
@@ -212,7 +212,7 @@
   }
 }
 
-.dashboard_builder_container {
+.dashboard_container {
   @keyframes rotating {
     from {
       -ms-transform: rotate(0deg);
@@ -235,7 +235,7 @@
   }
 
 
-  .dashboard_builder_control_panel {
+  .dashboard_control_panel {
     position: relative;
     min-height: 80px;
     border-bottom: 1px solid #cccccc;
@@ -247,7 +247,7 @@
     .dashboard_header {
       width: 100%;
 
-      .dashboard_builder_title {
+      .dashboard_title {
         font-size: 18px;
         color: #8f8f8f;
         margin: 5px 0 5px 16px;
@@ -398,7 +398,7 @@
   padding-right: 12px;
   overflow: hidden;
   position: relative;
-  background: url(/odoo_dashboard_builder/static/src/img/select_arrow.png) no-repeat right;
+  background: url(/odoo_dashboard/static/src/img/select_arrow.png) no-repeat right;
   -webkit-appearance: none !important;
   appearance: none;
   background-size: 12px 12px;

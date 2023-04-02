@@ -1,11 +1,11 @@
-odoo.define('odoo_dashboard_builder.DashboardItemTemplate', function (require) {
+odoo.define('odoo_dashboard.DashboardItemTemplate', function (require) {
     "use strict";
 
     const { Component } = owl;
     const { useState, useRef } = owl.hooks;
 
-    var ItemListCell = require('odoo_dashboard_builder.ListViewCell')
-    var ItemSubComponents = require('odoo_dashboard_builder.DashboardItemSubcomponents');
+    var ItemListCell = require('odoo_dashboard.ListViewCell')
+    var ItemSubComponents = require('odoo_dashboard.DashboardItemSubcomponents');
     var ItemTitleFrame = ItemSubComponents.ItemTitleFrame;
     var ItemNavigation = ItemSubComponents.ItemNavigation;
     var ItemTitle = ItemSubComponents.ItemTitle;

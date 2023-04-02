@@ -1,4 +1,4 @@
-odoo.define('odoo_dashboard_builder.DashboardBuilder', function (require) {
+odoo.define('odoo_dashboard.DashboardBuilder', function (require) {
     "use strict";
 
     var core = require('web.core');
@@ -7,37 +7,37 @@ odoo.define('odoo_dashboard_builder.DashboardBuilder', function (require) {
     var _t = core._t;
     const framework = require('web.framework');
 
-    var GridView = require('odoo_dashboard_builder.DashboardGrid');
-    var CustomFilter = require('odoo_dashboard_builder.CustomFilterHook');
-    var CustomPopup = require('odoo_dashboard_builder.CustomBoardPopup');
+    var GridView = require('odoo_dashboard.DashboardGrid');
+    var CustomFilter = require('odoo_dashboard.CustomFilterHook');
+    var CustomPopup = require('odoo_dashboard.CustomBoardPopup');
 
     const parsingMethod = {
         team: '_onChangeTeamFilter',
         period: '_onChangePeriodFilter'
     };
 
-    var dashboard_builder = AbstractAction.extend({
-        contentTemplate: 'odoo_dashboard_builder.dashboardBuilder',
+    var dashboard = AbstractAction.extend({
+        contentTemplate: 'odoo_dashboard.dashboardBuilder',
         hasControlPanel: false,
         xmlDependencies: [
-            '/odoo_dashboard_builder/static/src/xml/dashboard_view.xml',
-            '/odoo_dashboard_builder/static/src/xml/item_filter_view.xml',
-            '/odoo_dashboard_builder/static/src/xml/item_view.xml',
+            '/odoo_dashboard/static/src/xml/dashboard_view.xml',
+            '/odoo_dashboard/static/src/xml/item_filter_view.xml',
+            '/odoo_dashboard/static/src/xml/item_view.xml',
         ],
         jsLibs: [
-            '/odoo_dashboard_builder/static/lib/js/gridstack-h5.js',
+            '/odoo_dashboard/static/lib/js/gridstack-h5.js',
             '/web/static/lib/Chart/Chart.js',
-            '/odoo_dashboard_builder/static/lib/js/chartjs-plugin-datalabels.min.js',
-            '/odoo_dashboard_builder/static/lib/js/Chart.Geo.min.js',
-            '/odoo_dashboard_builder/static/lib/js/gauge.js',
-            '/odoo_dashboard_builder/static/lib/js/stack.js',
-            '/odoo_dashboard_builder/static/lib/js/string-similarity.min.js',
-            '/odoo_dashboard_builder/static/lib/js/html2pdf.js',
-            '/odoo_dashboard_builder/static/lib/js/html2canvas.min.js',
+            '/odoo_dashboard/static/lib/js/chartjs-plugin-datalabels.min.js',
+            '/odoo_dashboard/static/lib/js/Chart.Geo.min.js',
+            '/odoo_dashboard/static/lib/js/gauge.js',
+            '/odoo_dashboard/static/lib/js/stack.js',
+            '/odoo_dashboard/static/lib/js/string-similarity.min.js',
+            '/odoo_dashboard/static/lib/js/html2pdf.js',
+            '/odoo_dashboard/static/lib/js/html2canvas.min.js',
             '/web/static/lib/daterangepicker/daterangepicker.js'
         ],
         cssLibs: [
-            '/odoo_dashboard_builder/static/lib/css/gridstack.min.css',
+            '/odoo_dashboard/static/lib/css/gridstack.min.css',
             '/web/static/lib/daterangepicker/daterangepicker.css'
         ],
         events: {
@@ -166,7 +166,7 @@ odoo.define('odoo_dashboard_builder.DashboardBuilder', function (require) {
 
         render_dashboard: async function () {
             let self = this;
-            const container = self.el.getElementsByClassName("dashboard_builder_container")[0];
+            const container = self.el.getElementsByClassName("dashboard_container")[0];
             if (container) {
                 let params = {
                     itemConfigs: self.boardItems,
@@ -259,7 +259,7 @@ odoo.define('odoo_dashboard_builder.DashboardBuilder', function (require) {
             let $el = this.$('#btn_edit_layout');
             let bkg = $el.css('background-color');
             let color = $el.css('color');
-            this.dashboardDOM = document.getElementsByClassName('dashboard_builder_container')[0];
+            this.dashboardDOM = document.getElementsByClassName('dashboard_container')[0];
             this.dashboardDOM.style.setProperty('--prt', color);
             this.dashboardDOM.style.setProperty('--prb', bkg);
         },
@@ -775,6 +775,6 @@ odoo.define('odoo_dashboard_builder.DashboardBuilder', function (require) {
         }
     });
 
-    core.action_registry.add("odoo_dashboard_builder", dashboard_builder);
-    return dashboard_builder;
+    core.action_registry.add("odoo_dashboard", dashboard);
+    return dashboard;
 });

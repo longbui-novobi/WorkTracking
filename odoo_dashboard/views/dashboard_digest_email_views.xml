@@ -18,15 +18,15 @@
                     <button type="object" name="action_deactivate" string="Deactivate for everyone"
                             class="oe_highlight"
                             attrs="{'invisible': [('state','=','deactivated')]}"
-                            groups="odoo_dashboard_builder.dashboard_group_user"/>
+                            groups="odoo_dashboard.dashboard_group_user"/>
                     <button type="object" name="action_activate" string="Activate"
                             class="oe_highlight"
                             attrs="{'invisible': [('state','=','activated')]}"
-                            groups="odoo_dashboard_builder.dashboard_group_user"/>
+                            groups="odoo_dashboard.dashboard_group_user"/>
                     <button type="object" name="action_send" string="Send Now"
                             class="oe_highlight"
                             attrs="{'invisible': [('state','=','deactivated')]}"
-                            groups="odoo_dashboard_builder.dashboard_group_user"/>
+                            groups="odoo_dashboard.dashboard_group_user"/>
                     <field name="state" widget="statusbar"/>
                 </header>
             </xpath>
@@ -37,7 +37,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//page[@name='recipients']" position="attributes">
-                <attribute name="groups">odoo_dashboard_builder.dashboard_group_user</attribute>
+                <attribute name="groups">odoo_dashboard.dashboard_group_user</attribute>
                 <attribute name="string">Recipients</attribute>
             </xpath>
             <xpath expr="//field[@name='user_ids']" position="attributes">
@@ -54,6 +54,6 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'tree', 'view_id': ref('digest.digest_digest_view_tree')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('odoo_dashboard_builder.digest_digest_view_form_inherit')})]"/>
+            (0, 0, {'view_mode': 'form', 'view_id': ref('odoo_dashboard.digest_digest_view_form_inherit')})]"/>
     </record>
 </odoo>

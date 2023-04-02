@@ -1,4 +1,4 @@
-odoo.define('odoo_dashboard_builder.DashboardItemFilter', function (require) {
+odoo.define('odoo_dashboard.DashboardItemFilter', function (require) {
     "use strict";
 
     const { Component } = owl;

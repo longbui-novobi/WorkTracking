@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-<t t-name="odoo_dashboard_builder.dashboardBuilderPopup">
+<t t-name="odoo_dashboard.dashboardBuilderPopup">
             <div role="dialog" class="modal o_legacy_dialog o_technical_modal show" style="display: block;">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">

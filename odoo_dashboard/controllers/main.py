@@ -22,7 +22,7 @@ except ImportError:
 
 class ListViewItemExport(http.Controller):
 
-    @http.route(['/dashboard_builder/list_view/extract'], type='http', methods=['POST'])
+    @http.route(['/dashboard/list_view/extract'], type='http', methods=['POST'])
     def download_xlsx(self, data):
         data = json.loads(data)
         item_id = data.get('item_id',0) or 0

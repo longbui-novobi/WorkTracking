@@ -31,7 +31,7 @@ class ResUsers(models.Model):
     @api.depends('groups_id')
     def _compute_dashboard_user(self):
         for user in self:
-            if user.has_group('odoo_dashboard_builder.dashboard_group_user'):
+            if user.has_group('odoo_dashboard.dashboard_group_user'):
                 user.is_dashboard_user = True
             else:
                 user.is_dashboard_user = False

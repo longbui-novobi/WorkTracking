@@ -74,9 +74,9 @@
                             <!--                            <field name="eligible_item_ids" invisible="1"/>-->
                             <field name="filter_type_ids" widget="many2many_tags"
                                    options="{'no_create_edit': True, 'no_create': True}"/>
-                            <field name="menu_name" groups="odoo_dashboard_builder.dashboard_group_manager"/>
-                            <field name="menu_sequence" groups="odoo_dashboard_builder.dashboard_group_manager"/>
-                            <field name="parent_menu_id" groups="odoo_dashboard_builder.dashboard_group_manager"
+                            <field name="menu_name" groups="odoo_dashboard.dashboard_group_manager"/>
+                            <field name="menu_sequence" groups="odoo_dashboard.dashboard_group_manager"/>
+                            <field name="parent_menu_id" groups="odoo_dashboard.dashboard_group_manager"
                                    domain="['|', ('parent_id', '=', False), ('action', '=', False)]"
                                    options="{'no_create_edit': True, 'no_create': True}"/>
                         </group>
@@ -96,7 +96,7 @@
                                 </field>
                             </page>
                             <page id="board_configurations" string="Configurations"
-                                  groups="odoo_dashboard_builder.dashboard_group_manager">
+                                  groups="odoo_dashboard.dashboard_group_manager">
                                 <group>
                                     <field name="allowed_group_ids"
                                            options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"
@@ -105,7 +105,7 @@
                                     <field name="allowed_user_ids"
                                            domain="[('is_dashboard_user', '=', True)]"
                                            widget="many2many_tags"
-                                           context="{'tree_view_ref': 'odoo_dashboard_builder.view_dashboard_user_list'}"
+                                           context="{'tree_view_ref': 'odoo_dashboard.view_dashboard_user_list'}"
                                            options="{'no_create_edit': True, 'no_create': True}">
                                     </field>
                                 </group>
@@ -120,7 +120,7 @@
     <record id="view_dashboard_board_user_form" model="ir.ui.view">
         <field name="name">view.dashboard.board.form</field>
         <field name="model">bi.dashboard.board</field>
-        <field name="inherit_id" ref="odoo_dashboard_builder.view_dashboard_board_form"/>
+        <field name="inherit_id" ref="odoo_dashboard.view_dashboard_board_form"/>
         <field name="priority">1</field>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
@@ -225,7 +225,7 @@
 
                             </group>
                         </div>
-                        <div class="dashboard_builder_preview offset-md-1 col-md-6">
+                        <div class="dashboard_preview offset-md-1 col-md-6">
                             <field nolabel='1' name="preview" widget="omni_dashboard_preview"/>
                         </div>
                     </div>
