@@ -83,7 +83,7 @@ class WtTimeLog(models.Model):
 
     def write(self, values):
         if 'issue_id' in values:
-            to_delete_logs = self.filtered(lambda r: r.issue_id.id != values['issue_id'])
+            to_delete_logs = self.filtered(lambda r: r.issue_id.id != values['issue_id'] and r.export_state)
             _logger.info(to_delete_logs) 
             if to_delete_logs:
                 to_delete_logs.delete_work_logs_on_server()
