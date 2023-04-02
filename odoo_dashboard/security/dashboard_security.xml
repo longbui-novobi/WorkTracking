@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+<!--        <record id="dashboard_company_rule" model="ir.rule">-->
+<!--            <field name="name">for Employee</field>-->
+<!--            <field name="model_id" ref="odoo_dashboard_builder.model_bi_dashboard_board_config"/>-->
+<!--            <field name="domain_force">[('company_id','in',company_ids)]</field>-->
+<!--        </record>-->
+
+<!--        <record id="item_company_rule" model="ir.rule">-->
+<!--            <field name="name">for Employee</field>-->
+<!--            <field name="model_id" ref="odoo_dashboard_builder.model_bi_dashboard_item_config"/>-->
+<!--            <field name="domain_force">[('company_id','in',company_ids)]</field>-->
+<!--        </record>-->
+
+        <record id="base.module_category_dashboard_omni_dashboard" model="ir.module.category">
+            <field name="sequence">90</field>
+        </record>
+
+        <record id="dashboard_group_user" model="res.groups">
+            <field name="name">Dashboard User</field>
+            <field name="category_id" ref="base.module_category_dashboard_omni_dashboard"/>
+        </record>
+
+        <record id="dashboard_group_manager" model="res.groups">
+            <field name="name">Dashboard Manager</field>
+            <field name="category_id" ref="base.module_category_dashboard_omni_dashboard"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+            <field name="implied_ids" eval="[(4, ref('odoo_dashboard_builder.dashboard_group_user'))]"/>
+        </record>
+    </data>
+</odoo>

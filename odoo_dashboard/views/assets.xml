@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="odoo_dashboard_builder_backend" inherit_id="web.assets_backend" active="True">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/scss"
+                  href="/odoo_dashboard_builder/static/src/css/dashboard_builder_style.scss"/>
+            <link rel="stylesheet" type="text/scss"
+                  href="/odoo_dashboard_builder/static/src/css/item_style.scss"/>
+            <link rel="stylesheet" type="text/scss"
+                  href="/odoo_dashboard_builder/static/src/css/dashboard_action_popup_style.scss"/>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/dashboard_builder_owl.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/dashboard_item_filter_owl.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/dashboard_item_subcomponents_owl.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/dashboard_item_template_owl.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/dashboard_item_owl.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/dashboard_grid_owl.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/basic_view_inherit.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/hook/custom_filter_hook.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/list_view_header_button.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/hook/custom_popup.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/owl/preview/item_preview.js"></script>
+            <script type="text/javascript"
+                    src="/odoo_dashboard_builder/static/src/js/hook/list_view_cell.js"></script>
+        </xpath>
+    </template>
+</odoo>

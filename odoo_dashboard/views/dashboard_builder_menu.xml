@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="action_dashboard_configuration" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'odoo_dashboard_builder', 'bin_size': False}</field>
+    </record>
+
+    <record id="action_dashboard_boards_config_view" model="ir.actions.act_window">
+        <field name="name">Personal Dashboards</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">bi.dashboard.board.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="odoo_dashboard_builder.view_dashboard_board_config_list"/>
+        <field name="search_view_id" ref="odoo_dashboard_builder.view_dashboard_board_config_search"/>
+        <!--        <field name="context">{'active_test':False}</field>-->
+        <field name="domain">[('user_id', '=', uid)]</field>
+    </record>
+
+    <record id="action_dashboard_items_config_view" model="ir.actions.act_window">
+        <field name="name">Personal Dashboard Items</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">bi.dashboard.item.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="odoo_dashboard_builder.view_dashboard_item_config_list"/>
+        <field name="search_view_id" ref="odoo_dashboard_builder.view_dashboard_item_config_search"/>
+        <field name="domain">[('user_id', '=', uid)]</field>
+    </record>
+
+    <record id="action_master_dashboard_boards_view" model="ir.actions.act_window">
+        <field name="name">Dashboard Boards</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">bi.dashboard.board</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('odoo_dashboard_builder.view_dashboard_board_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('odoo_dashboard_builder.view_dashboard_board_form')})]"/>
+        <field name="view_id" ref=""/>
+        <field name="search_view_id" ref="odoo_dashboard_builder.view_dashboard_board_search"/>
+    </record>
+
+    <record id="action_master_dashboard_items_view" model="ir.actions.act_window">
+        <field name="name">Dashboard Items</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">bi.dashboard.item</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="odoo_dashboard_builder.view_dashboard_item_list"/>
+        <field name="search_view_id" ref="odoo_dashboard_builder.view_dashboard_item_search"/>
+        <field name="context">{
+            'default_created_on_ui' : True,
+            'default_compute_function': 'get_data_for_custom_item',
+            'default_x_position': 0,
+            'default_y_position': 10000,
+            }
+        </field>
+    </record>
+
+    <menuitem name="Omni Dashboard"
+              id="dashboard_main_menu_item"
+              sequence="40"
+              web_icon="odoo_dashboard_builder,static/description/icon.png"
+              groups="odoo_dashboard_builder.dashboard_group_user"/>
+
+    <menuitem name="Configuration"
+              id="dashboard_configuration_menu_item"
+              parent="odoo_dashboard_builder.dashboard_main_menu_item"
+              sequence="100"
+              groups="odoo_dashboard_builder.dashboard_group_user"/>
+
+    <menuitem name="Settings"
+              id="dashboard_settings_menu_item"
+              sequence="10"
+              parent="odoo_dashboard_builder.dashboard_configuration_menu_item"
+              action="odoo_dashboard_builder.action_dashboard_configuration"
+              groups="odoo_dashboard_builder.dashboard_group_manager"/>
+
+    <menuitem name="Digest Emails"
+              id="dashboard_digest_email_menu_item"
+              sequence="20"
+              parent="odoo_dashboard_builder.dashboard_configuration_menu_item"
+              action="odoo_dashboard_builder.action_digest_emails_view"
+              groups="odoo_dashboard_builder.dashboard_group_user"/>
+
+    <menuitem name="Dashboard"
+              id="dashboard_dashboard_menu_item"
+              sequence="30"
+              parent="odoo_dashboard_builder.dashboard_configuration_menu_item"
+              groups="odoo_dashboard_builder.dashboard_group_user"/>
+
+    <menuitem name="Personal Dashboards"
+              id="dashboard_dashboard_board_menu_item"
+              sequence="10"
+              parent="odoo_dashboard_builder.dashboard_dashboard_menu_item"
+              action="odoo_dashboard_builder.action_dashboard_boards_config_view"
+              groups="odoo_dashboard_builder.dashboard_group_user"/>
+
+    <menuitem name="Personal Dashboard Items"
+              id="dashboard_dashboard_item_menu_item"
+              sequence="20"
+              parent="odoo_dashboard_builder.dashboard_dashboard_menu_item"
+              action="odoo_dashboard_builder.action_dashboard_items_config_view"
+              groups="odoo_dashboard_builder.dashboard_group_user"/>
+
+    <menuitem name="Master"
+              id="dashboard_master_dashboard_menu_item"
+              sequence="40"
+              parent="odoo_dashboard_builder.dashboard_configuration_menu_item"
+              groups="odoo_dashboard_builder.dashboard_group_manager"/>
+
+    <menuitem name="Dashboards"
+              id="dashboard_master_dashboard_board_menu_item"
+              sequence="10"
+              parent="odoo_dashboard_builder.dashboard_master_dashboard_menu_item"
+              action="odoo_dashboard_builder.action_master_dashboard_boards_view"
+              groups="odoo_dashboard_builder.dashboard_group_manager"/>
+
+    <menuitem name="Dashboard Items"
+              id="dashboard_master_dashboard_item_menu_item"
+              sequence="20"
+              parent="odoo_dashboard_builder.dashboard_master_dashboard_menu_item"
+              action="odoo_dashboard_builder.action_master_dashboard_items_view"
+              groups="odoo_dashboard_builder.dashboard_group_manager"/>
+</odoo>

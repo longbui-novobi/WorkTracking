@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+<t t-name="odoo_dashboard_builder.dashboardBuilderPopup">
+            <div role="dialog" class="modal o_legacy_dialog o_technical_modal show" style="display: block;">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h4 class="modal-title">Dashboard Item: Action
+                                <span class="o_subtitle text-muted small"></span>
+                            </h4>
+                            <button class="close">×
+                            </button>
+                        </header>
+                        <main class="modal-body o_act_window">
+                            <div class="o_action o_cannot_create o_view_controller">
+                                <div class="o_content">
+                                    <div class="o_form_view o_xxl_form_view o_form_nosheet o_form_editable">
+                                        <div class="dashboard-item-control-popup">
+                                            <span class="o_field_widget o_readonly_modifier action"
+                                            > <t t-esc="widget.action_name"/>
+                                            </span>
+                                            <span
+                                                    class="o_field_widget o_readonly_modifier dsp-text text-primary">
+                                                <span><t t-esc="widget.item_name"/></span>
+                                            </span>
+                                            <span class="dsp-text">item</span>
+                                            <t t-if="widget.action_name !== 'Add'">
+                                            <span class="dsp-text">from
+                                            </span>
+                                                <span
+                                                        class="o_field_widget o_readonly_modifier dsp-text text-primary">
+                                                <span><t t-esc="widget.now_board"/></span>
+                                            </span>
+                                            </t>
+                                            <span class="dsp-text">to
+                                            </span>
+                                            <div class="o_required_modifier" id="target-board"
+                                                 style="display:inline-block;">
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                        <footer class="modal-footer">
+                            <div>
+                                <footer>
+                                    <button type="button" class="btn btn-apply btn-primary">
+                                        <span>Apply</span>
+                                    </button>
+                                    <button type="button" class="btn btn-cancel btn-secondary">
+                                        <span>Cancel</span>
+                                    </button>
+                                </footer>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+</t>
+
+</templates>
