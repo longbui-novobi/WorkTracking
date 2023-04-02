@@ -85,17 +85,18 @@ class WtTimeLog(models.Model):
         if 'issue_id' in values:
             to_delete_logs = self.filtered(lambda r: r.issue_id.id != values['issue_id'])
             _logger.info(to_delete_logs) 
-            to_delete_logs.delete_work_logs_on_server()
-            self.env.cr.execute("""
-                UPDATE wt_time_log 
-                SET 
-                capture_export_description = 0, 
-                capture_export_duration = 0, 
-                capture_export_start_date = '1970-01-01',
-                export_state = 0,
-                id_on_wt = 0
-                WHERE id in %(ids)s
-            """, {'ids': tuple(to_delete_logs.ids)})
+            if to_delete_logs:
+                to_delete_logs.delete_work_logs_on_server()
+                self.env.cr.execute("""
+                    UPDATE wt_time_log 
+                    SET 
+                    capture_export_description = 0, 
+                    capture_export_duration = 0, 
+                    capture_export_start_date = '1970-01-01',
+                    export_state = 0,
+                    id_on_wt = 0
+                    WHERE id in %(ids)s
+                """, {'ids': tuple(to_delete_logs.ids)})
         res = True 
         self.rounding(values)
         if type(values.get('start_date', None)) in (int, float):
