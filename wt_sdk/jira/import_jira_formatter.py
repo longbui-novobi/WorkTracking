@@ -184,7 +184,6 @@ class ImportingJiraIssue(ImportingIssue):
         return response
 
     def parse_issue(self, issue):
-        _logger.info(issue)
         return Issue(issue, self.map)
 
 
