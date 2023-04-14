@@ -192,8 +192,9 @@ class TaskMigration(models.Model):
                 elif float(value):
                     try:
                         float("0%s"%curd_data[keys[index]])
-                    except:
-                        pass
+                    except Exception as e:
+                        _logger.error(e)
+                        _logger.error("ERROR ON RECORD: %s" % existing_record)
                     if float(value) == float("0%s"%curd_data[keys[index]]):
                         del curd_data[keys[index]]
             else:
