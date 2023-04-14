@@ -174,30 +174,31 @@ class TaskMigration(models.Model):
     @api.model
     def minify_with_existing_record(self, curd_data, existing_record):
         index, length, keys = 0, len(curd_data.keys()), list(curd_data.keys())
-        try:
-            while index < length:
-                if keys[index] not in SPECIAL_FIELDS:
-                    value = getattr(existing_record, keys[index])
-                    if isinstance(value, models.Model):
-                        if isinstance(curd_data[keys[index]], int):
-                            if value.id == curd_data[keys[index]]:
-                                del curd_data[keys[index]]
-                        elif not (set([x[1] for x in curd_data[keys[index]]]) - set(value.ids)):
+        while index < length:
+            if keys[index] not in SPECIAL_FIELDS:
+                value = getattr(existing_record, keys[index])
+                if isinstance(value, models.Model):
+                    if isinstance(curd_data[keys[index]], int):
+                        if value.id == curd_data[keys[index]]:
                             del curd_data[keys[index]]
-                    elif isinstance(value, datetime) or isinstance(curd_data[keys[index]], datetime):
-                        if value and value.isoformat()[:16] == curd_data[keys[index]].isoformat()[:16]:
-                            del curd_data[keys[index]]
-                    elif isinstance(value, str):
-                        if value.strip() == (curd_data[keys[index]] or '').strip():
-                            del curd_data[keys[index]]
-                    elif float(value):
+                    elif not (set([x[1] for x in curd_data[keys[index]]]) - set(value.ids)):
                         del curd_data[keys[index]]
-                else:
-                    del curd_data[keys[index]]
-                index += 1
-        except Exception as e:
-            _logger.error(e)
-            _logger.error("ERROR PARSING ON RECORDS: %s" %existing_record)
+                elif isinstance(value, datetime) or isinstance(curd_data[keys[index]], datetime):
+                    if value and value.isoformat()[:16] == curd_data[keys[index]].isoformat()[:16]:
+                        del curd_data[keys[index]]
+                elif isinstance(value, str):
+                    if value.strip() == (curd_data[keys[index]] or '').strip():
+                        del curd_data[keys[index]]
+                elif float(value):
+                    try:
+                        float("0%s"%curd_data[keys[index]])
+                    except:
+                        pass
+                    if float(value) == float("0%s"%curd_data[keys[index]]):
+                        del curd_data[keys[index]]
+            else:
+                del curd_data[keys[index]]
+            index += 1
         return curd_data
 
     # ===========================================  Section for loading issues/issues =============================================
