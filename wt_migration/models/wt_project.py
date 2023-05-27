@@ -17,7 +17,7 @@ class WtProject(models.Model):
     def cron_fetch_issue(self, load_create=True):
         if not self:
             self = self.search([('allow_to_fetch', '=', True), ('wt_migration_id.active', '=', True)])
-        latest_unix = int(self.env['ir.config_parameter'].get_param('latest_unix'))
+        latest_unix = int(self.env['ir.config_parameter'].sudo().get_param('latest_unix'))
         checkpoint_unix = datetime.now()
         allowed_user_ids = self.env['res.users'].search([]).token_exists()
         migration_dict = defaultdict(lambda: self.env['res.users'])
