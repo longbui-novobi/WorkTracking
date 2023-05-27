@@ -45,7 +45,7 @@ class WtProject(models.Model):
             wt.with_delay(eta=1).delete_work_logs_by_unix(latest_unix, migration_dict[wt])
             wt.with_delay(eta=2).load_work_logs_by_unix(latest_unix, migration_dict[wt])
         
-        self.env['ir.config_parameter'].set_param('latest_unix', int(checkpoint_unix.timestamp() * 1000))
+        self.env['ir.config_parameter'].sudo().set_param('latest_unix', int(checkpoint_unix.timestamp() * 1000))
 
     def load_new_project(self):
         migration_dict = defaultdict(lambda: self.env['wt.project'])
