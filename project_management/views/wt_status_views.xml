@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="wt_status_tree_view" model="ir.ui.view">
+        <field name="name">Task Statuses</field>
+        <field name="model">wt.status</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="key"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_wt_status" model="ir.actions.act_window">
+        <field name="name">Task Statuses</field>
+        <field name="res_model">wt.status</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="wt_status_tree_view"/>
+    </record>
+
+    <record id="status_manager_rule" model="ir.rule">
+        <field name="name">Manager Full Access</field>
+        <field name="model_id" ref="model_wt_status"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field eval="True" name="global"/>
+        <field name="groups" eval="[(4, ref('project_management.group_wt_admin'))]"/>
+    </record>
+
+    <record id="status_user_limited_access" model="ir.rule">
+        <field name="name">User Limited Access</field>
+        <field name="model_id" ref="model_wt_status"/>
+        <field eval="False" name="global"/>
+        <field name="domain_force">[('project_id.allowed_user_ids', '=', user.id), '|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
