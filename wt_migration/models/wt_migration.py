@@ -128,16 +128,21 @@ class TaskMigration(models.Model):
                 users |= new_user
 
     def load_projects(self):
+        all_projects = self.env['wt.project']
         for migration in self:
             headers = migration.__get_request_headers()
             result = requests.get(f"{migration.wt_server_url}/project", headers=headers)
             project_by_key = {}
             for record in json.loads(result.text):
                 project_by_key[record['key']] = record['id']
-            
-            for project in self.env['wt.project'].search([('wt_migration_id', '=', migration.id)]):
+            projects = self.env['wt.project'].search([('wt_migration_id', '=', migration.id)])
+            for project in projects:
                 if project.project_key in project_by_key:
                     project.external_id = project_by_key[project.project_key]
+            all_projects |= projects
+        return projects
+            
+        
     
     def update_projects_id(self):
         self.ensure_one()
