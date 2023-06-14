@@ -84,6 +84,7 @@ class TaskMigration(models.Model):
         self.ensure_one()
         headers = self.__get_request_headers()
         result = requests.get(f"{self.wt_server_url}//permissions", headers=headers)
+        _logger.warning(result.text)
         record = json.loads(result.text)
 
     def _get_single_project(self, project_key):
